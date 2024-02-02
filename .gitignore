@@ -3,3 +3,8 @@
 bin/
 bin-int/
 *.user
+*.sln
+
+#File formats
+*.sln
+*.vcxproj
