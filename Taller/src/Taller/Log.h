@@ -25,7 +25,7 @@ namespace Taller {
 
 		static void Init();
 
-		static void RegisterLog(bool checkCondition, const LogCategory& category, const char* message, ...);
+		static void RegisterLog(bool checkCondition, const LogCategory& category, std::string message, ...);
 
 	private:
 		static std::string CurrentDateTimeToString();

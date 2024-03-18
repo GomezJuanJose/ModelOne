@@ -21,7 +21,7 @@ namespace Taller {
 	}
 
 	//TODO Add color
-	void Log::RegisterLog(bool checkCondition, const LogCategory& category, const char* message, ...) {
+	void Log::RegisterLog(bool checkCondition, const LogCategory& category, std::string message, ...) {
 		//TODO Async print
 		//TODO Make efficient printing
 
@@ -32,7 +32,7 @@ namespace Taller {
 			va_list args;
 
 			va_start(args, message);
-			vsprintf_s(buffer, message, args);
+			vsprintf_s(buffer, message.c_str(), args);
 			va_end(args);
 
 			finalString = "[" + logCategoryList[category] + "] [" + CurrentDateTimeToString() + "] :: " + std::string(buffer);
