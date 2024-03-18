@@ -23,6 +23,7 @@ project "Taller"
     }
 
     includedirs{
+        "%{prj.name}/src"
         --Use for third parties libs in this case
         --"%{prj.name}/vendor/THIRD_PARTY_LIB/include"
     }
