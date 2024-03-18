@@ -1,7 +1,6 @@
 #pragma once
 #include "Event.h"
 
-#include <sstream>
 
 namespace Taller {
 	class TALLER_API WindowResizeEvent : public Event {

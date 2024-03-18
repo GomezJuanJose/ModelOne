@@ -1,8 +1,7 @@
 #pragma once
 
 #include "Core.h"
-#include <string>
-#include <vector>
+
 
 // TODO: Implement loggin basics. Needs to print a message with a category, n argumenst with x color and check if prints it given a bool.
 // TODO: Strip the logs when is distribution build

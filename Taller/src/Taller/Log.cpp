@@ -1,7 +1,7 @@
-
+#include "tlpch.h"
 #include "Log.h"
 
-#include <iostream>
+
 #include <chrono>
 #include <ctime>
 #include <cstdarg>

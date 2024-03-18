@@ -17,6 +17,9 @@ project "Taller"
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
     
+    pchheader "tlpch.h"
+    pchsource "Taller/src/tlpch.cpp" --For visual studio
+
     files{
         "%{prj.name}/src/**.h",
         "%{prj.name}/src/**.cpp",

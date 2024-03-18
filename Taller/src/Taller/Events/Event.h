@@ -2,8 +2,6 @@
 
 #include "Taller/Core.h"
 
-#include <string>
-#include <functional>
 
 namespace Taller {
 
