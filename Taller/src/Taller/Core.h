@@ -11,4 +11,11 @@
 #endif
 
 
+//TODO Create a own class of assertions
+#ifdef TL_ENABLE_ASSERTS
+	#define TL_ASSERT(condition, message, ...) {if(!(condition)){TL_LOG_ERROR(true, "Assertion failed! => "+message, __VA_ARGS__); __debugbreak();}}
+#else
+	#define TL_ASSERT(condition, message, ...)
+#endif
+
 #define BIT(x) (1 << x)

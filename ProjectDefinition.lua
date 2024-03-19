@@ -9,6 +9,12 @@ workspace "Taller"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+--Include directories relative to root folder (solution directory)
+IncludeDir = {}
+IncludeDir["GLFW"] = "Taller/vendor/GLFW/include"
+
+include "Taller/vendor/GLFW"
+
 project "Taller"
     location "Taller"
     kind "SharedLib"
@@ -26,9 +32,16 @@ project "Taller"
     }
 
     includedirs{
-        "%{prj.name}/src"
+        "%{prj.name}/src",
+        "%{IncludeDir.GLFW}"
         --Use for third parties libs in this case
         --"%{prj.name}/vendor/THIRD_PARTY_LIB/include"
+    }
+
+    links{
+        "GLFW",
+        "opengl32.lib",
+        "dwmapi.lib"
     }
 
     filter "system:windows" --Tabulation doesnt mean anything, from this line below is applied only for windows
@@ -42,19 +55,22 @@ project "Taller"
         }
 
         postbuildcommands{
-            ("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Sandbox")
+            ("{COPY} %{cfg.buildtarget.relpath} \"../bin/" .. outputdir .. "/Sandbox/\"")
         }
 
     filter "configurations:Debug"
         defines "TL_DEBUG"
+        buildoptions "/MDd"
         symbols "On"
 
     filter "configurations:Release"
         defines "TL_RELEASE"
+        buildoptions "/MD"
         optimize "On"
 
     filter "configurations:Distribution"
         defines "TL_DISTRIBUTION"
+        buildoptions "/MD"
         optimize "On"
 
 
