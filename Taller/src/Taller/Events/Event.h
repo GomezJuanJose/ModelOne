@@ -66,7 +66,7 @@ namespace Taller {
 		template <typename T>
 		bool Dispatch(EventFn<T> func) {//TODO Put a safety check to see if is an Event type
 			if (m_Event.GetEventType() == T::GetStaticType()) {
-				m_Event.m_Handle = func(*(T*)&m_Event);
+				m_Event.m_Handled = func(*(T*)&m_Event);
 				return true;
 			}
 

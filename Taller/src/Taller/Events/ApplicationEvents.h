@@ -25,9 +25,9 @@ namespace Taller {
 	};
 
 
-	class TALLER_API WindowClose : public Event {
+	class TALLER_API WindowCloseEvent : public Event {
 	public:
-		WindowClose() {}
+		WindowCloseEvent() {}
 
 		EVENT_CLASS_TYPE(WindowClose)
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
