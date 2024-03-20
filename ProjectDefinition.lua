@@ -108,12 +108,15 @@ project "Sandbox"
 
     filter "configurations:Debug"
         defines "TL_DEBUG"
+        buildoptions "/MDd"
         symbols "On"
 
     filter "configurations:Release"
         defines "TL_RELEASE"
+        buildoptions "/MD"
         optimize "On"
 
     filter "configurations:Distribution"
         defines "TL_DISTRIBUTION"
+        buildoptions "/MD"
         optimize "On"
