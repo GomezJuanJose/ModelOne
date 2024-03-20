@@ -1,10 +1,7 @@
 #include "tlpch.h"
 #include "Application.h"
 
-
-//std::place_holder
-//std::bind
-//std::function<void(Event&)>
+//Explicar el porque de la excepcion de los dos heaps distintos cuando se accede desde un dll
 
 namespace Taller {
 
@@ -20,6 +17,11 @@ namespace Taller {
 
 	void Application::Run() {
 		while (m_IsRunning) {
+
+			for (Layer* layer : m_LayerStack) {
+				layer->OnUpdate();
+			}
+
 			m_Window->OnUpdate();
 		}
 	}
@@ -29,10 +31,25 @@ namespace Taller {
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FUNCTION(OnWindowClose));
 
 		TL_LOG_INFO(true, e.ToString());
+
+		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();) {
+			(*--it)->OnEvent(e);
+			if (e.Handled) {
+				break;
+			}
+		}
 	}
 
 	bool Application::OnWindowClose(WindowCloseEvent& e) {
 		m_IsRunning = false;
 		return true;
+	}
+
+	void Application::PushLayer(Layer* layer) {
+		m_LayerStack.PushLayer(layer);
+	}
+
+	void Application::PushOverlay(Layer* overlay) {
+		m_LayerStack.PushOverlay(overlay);
 	}
 }

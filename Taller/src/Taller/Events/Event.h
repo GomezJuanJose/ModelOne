@@ -47,11 +47,11 @@ namespace Taller {
 			return GetCategoryFlags() & category;
 		}
 
-	protected:
+	public:
 		//This is for avoid propagation to further layer, 
 		//for example if the click event is being handle by the UI then its no use to propagate 
 		//that event to the World itself because that event has fall on the bounds of the UI
-		bool m_Handled = false; //TODO think to rename it to m_isHandle depending of the coding guidelines used
+		bool Handled = false; //TODO think to rename it to IsHandle depending of the coding guidelines used
 	};
 
 
@@ -66,7 +66,7 @@ namespace Taller {
 		template <typename T>
 		bool Dispatch(EventFn<T> func) {//TODO Put a safety check to see if is an Event type
 			if (m_Event.GetEventType() == T::GetStaticType()) {
-				m_Event.m_Handled = func(*(T*)&m_Event);
+				m_Event.Handled = func(*(T*)&m_Event);
 				return true;
 			}
 
