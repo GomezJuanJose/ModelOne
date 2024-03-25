@@ -7,13 +7,22 @@ workspace "Taller"
         "Distribution"
     }
 
+    startproject "Sandbox"
+
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 --Include directories relative to root folder (solution directory)
 IncludeDir = {}
 IncludeDir["GLFW"] = "Taller/vendor/GLFW/include"
+IncludeDir["Glad"] = "Taller/vendor/Glad/include"
+IncludeDir["ImGui"] = "Taller/vendor/ImGui"
 
-include "Taller/vendor/GLFW"
+group "Dependencies"
+    include "Taller/vendor/GLFW"
+    include "Taller/vendor/Glad"
+    include "Taller/vendor/ImGui"
+group""
+
 
 project "Taller"
     location "Taller"
@@ -33,13 +42,17 @@ project "Taller"
 
     includedirs{
         "%{prj.name}/src",
-        "%{IncludeDir.GLFW}"
+        "%{IncludeDir.GLFW}",
+        "%{IncludeDir.Glad}",
+        "%{IncludeDir.ImGui}"
         --Use for third parties libs in this case
         --"%{prj.name}/vendor/THIRD_PARTY_LIB/include"
     }
 
     links{
         "GLFW",
+        "Glad",
+        "ImGui",
         "opengl32.lib",
         "dwmapi.lib"
     }
@@ -51,7 +64,8 @@ project "Taller"
 
         defines{
             "TL_PLATFORM_WINDOWS",
-            "TL_BUILD_DLL"
+            "TL_BUILD_DLL",
+            "GLFW_INCLUDE_NONE"
         }
 
         postbuildcommands{
@@ -90,7 +104,8 @@ project "Sandbox"
     includedirs{
         --Use for third parties libs in this case
         --"Taller/vendor/THIRD_PARTY_LIB/include",
-        "Taller/src"
+        "Taller/src",
+        "Taller/vendor"
     }
 
     links{

@@ -5,6 +5,8 @@
 #include "Taller/Events/KeyEvents.h"
 #include "Taller/Events/MouseEvents.h"
 
+#include <glad/glad.h>
+
 namespace Taller {
 	static bool s_GLFWInitialized = false;
 
@@ -38,6 +40,10 @@ namespace Taller {
 
 		m_Window = glfwCreateWindow((int)properties.Width, (int)properties.Height, properties.Title.c_str(), nullptr, nullptr);
 		glfwMakeContextCurrent(m_Window);
+
+		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+		TL_ASSERT(status, "Failed to initialize Glad!");
+
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 		SetVSync(true);
 

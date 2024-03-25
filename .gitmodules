@@ -1,3 +1,6 @@
 [submodule "Taller/vendor/GLFW"]
 	path = Taller/vendor/GLFW
 	url = https://github.com/glfw/glfw
+[submodule "Taller/vendor/ImGui"]
+	path = Taller/vendor/ImGui
+	url = https://github.com/ocornut/imgui

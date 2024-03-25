@@ -5,6 +5,8 @@
 #include "Taller/Layer.h"
 #include "Taller/Log.h"
 
+#include "Taller/ImGui/ImGuiLayer.h"
+
 /* -== ENTRY POINT ==- */
 #include "Taller/EntryPoint.h"
 /* -=================- */

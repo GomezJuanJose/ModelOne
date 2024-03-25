@@ -7,6 +7,7 @@
 #include "Taller/Events/ApplicationEvents.h"
 
 #include "Taller/LayerStack.h"
+#include "Taller/ImGui/ImGuiLayer.h"
 
 namespace Taller {
 	class TALLER_API Application {
@@ -21,6 +22,9 @@ namespace Taller {
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* overlay);
 
+		inline Window& GetWindow() { return *m_Window; }
+		inline static Application& Get() { return *s_Instance; }
+
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
 
@@ -28,7 +32,12 @@ namespace Taller {
 	private:
 		bool m_IsRunning = true;
 		LayerStack m_LayerStack;
+		ImGuiLayer* m_ImGuiLayer;
 		std::unique_ptr<Window> m_Window;
+		
+
+	private:
+		static Application* s_Instance;
 	};
 
 	//To be defined in client
