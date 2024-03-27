@@ -16,6 +16,7 @@ IncludeDir = {}
 IncludeDir["GLFW"] = "Taller/vendor/GLFW/include"
 IncludeDir["Glad"] = "Taller/vendor/Glad/include"
 IncludeDir["ImGui"] = "Taller/vendor/ImGui"
+IncludeDir["glm"] = "Taller/vendor/glm"
 
 group "Dependencies"
     include "Taller/vendor/GLFW"
@@ -44,7 +45,8 @@ project "Taller"
         "%{prj.name}/src",
         "%{IncludeDir.GLFW}",
         "%{IncludeDir.Glad}",
-        "%{IncludeDir.ImGui}"
+        "%{IncludeDir.ImGui}",
+        "%{IncludeDir.glm}"
         --Use for third parties libs in this case
         --"%{prj.name}/vendor/THIRD_PARTY_LIB/include"
     }
@@ -105,7 +107,8 @@ project "Sandbox"
         --Use for third parties libs in this case
         --"Taller/vendor/THIRD_PARTY_LIB/include",
         "Taller/src",
-        "Taller/vendor"
+        "Taller/vendor",
+        "%{IncludeDir.glm}"
     }
 
     links{
