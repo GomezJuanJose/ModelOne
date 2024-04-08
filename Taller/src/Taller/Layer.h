@@ -4,7 +4,7 @@
 #include "Taller/Events/Event.h"
 
 namespace Taller{
-	class TALLER_API Layer {
+	class Layer {
 	public:
 		Layer(const std::string& name = "Layer");
 		virtual ~Layer();

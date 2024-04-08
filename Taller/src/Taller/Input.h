@@ -3,7 +3,7 @@
 #include "Taller/Core.h"
 
 namespace Taller {
-	class TALLER_API Input {
+	class Input {
 	public:
 		inline static bool IsKeyPressed(int keycode) { return s_Instance->IsKeyPressedImplementation(keycode); }
 

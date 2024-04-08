@@ -16,7 +16,7 @@ namespace Taller {
 	};
 
 
-	class TALLER_API Log {
+	class Log {
 	public:
 
 		Log();

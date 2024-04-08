@@ -10,7 +10,7 @@
 #include "Taller/ImGui/ImGuiLayer.h"
 
 namespace Taller {
-	class TALLER_API Application {
+	class Application {
 	public:
 		Application();
 		virtual ~Application();

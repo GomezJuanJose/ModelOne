@@ -15,7 +15,7 @@ namespace Taller {
 	};
 
 	//Interface representation of a desktop system based window
-	class TALLER_API Window {
+	class Window {
 	public:
 		using EventCallbackFn = std::function<void(Event&)>;
 

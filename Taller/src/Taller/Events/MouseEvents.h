@@ -4,7 +4,7 @@
 
 namespace Taller {
 
-	class TALLER_API MouseMovedEvent : public Event {
+	class MouseMovedEvent : public Event {
 	public:
 		MouseMovedEvent(float x, float y) : m_MouseX(x), m_MouseY(y){}
 
@@ -25,7 +25,7 @@ namespace Taller {
 	};
 
 
-	class TALLER_API MouseScrolledEvent : public Event {
+	class MouseScrolledEvent : public Event {
 	public:
 		MouseScrolledEvent(float xOffset, float yOffset) : m_XOffset(xOffset), m_YOffset(yOffset){}
 
@@ -47,7 +47,7 @@ namespace Taller {
 	};
 
 
-	class TALLER_API MouseButtonEvent : public Event {
+	class MouseButtonEvent : public Event {
 	public:
 		inline int GetMouseButton() const { return m_Button; }
 
@@ -60,7 +60,7 @@ namespace Taller {
 	};
 
 
-	class TALLER_API MouseButtonPressedEvent : public MouseButtonEvent {
+	class MouseButtonPressedEvent : public MouseButtonEvent {
 	public:
 		MouseButtonPressedEvent(int button) : MouseButtonEvent(button){}
 
@@ -74,7 +74,7 @@ namespace Taller {
 	};
 
 
-	class TALLER_API MouseButtonReleasedEvent : public MouseButtonEvent {
+	class MouseButtonReleasedEvent : public MouseButtonEvent {
 	public:
 		MouseButtonReleasedEvent(int button) : MouseButtonEvent(button){}
 

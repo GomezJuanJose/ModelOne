@@ -34,7 +34,7 @@ namespace Taller {
 
 	#define EVENT_CLASS_CATEGORY(category) virtual int GetCategoryFlags() const override {return category;}
 
-	class TALLER_API Event {
+	class Event {
 		friend class EventDispatcher;
 
 	public:

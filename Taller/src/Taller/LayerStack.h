@@ -7,7 +7,7 @@
 
 namespace Taller {
 
-	class TALLER_API LayerStack {
+	class LayerStack {
 	public:
 		LayerStack();
 		~LayerStack();

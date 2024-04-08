@@ -27,8 +27,10 @@ group""
 
 project "Taller"
     location "Taller"
-    kind "SharedLib"
+    kind "StaticLib"
     language "C++"
+    cppdialect "C++17"
+    staticruntime "on" --Links the run time libraries as static
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -60,8 +62,6 @@ project "Taller"
     }
 
     filter "system:windows" --Tabulation doesnt mean anything, from this line below is applied only for windows
-        cppdialect "C++17"
-        staticruntime "On" --Links the run time libraries as static
         systemversion "latest"
 
         defines{
@@ -70,30 +70,25 @@ project "Taller"
             "GLFW_INCLUDE_NONE"
         }
 
-        postbuildcommands{
-            ("{COPY} %{cfg.buildtarget.relpath} \"../bin/" .. outputdir .. "/Sandbox/\"")
-        }
-
     filter "configurations:Debug"
         defines "TL_DEBUG"
-        buildoptions "/MDd"
-        symbols "On"
+        symbols "on"
 
     filter "configurations:Release"
         defines "TL_RELEASE"
-        buildoptions "/MD"
-        optimize "On"
+        optimize "on"
 
     filter "configurations:Distribution"
         defines "TL_DISTRIBUTION"
-        buildoptions "/MD"
-        optimize "On"
+        optimize "on"
 
 
 project "Sandbox"
     location "SandboxProjects/Sandbox"
     kind "ConsoleApp"
     language "C++"
+    cppdialect "C++17"
+    staticruntime "on" --Links the run time libraries as static
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -115,9 +110,7 @@ project "Sandbox"
         "Taller" --Links the sandobx with the engine (the dynamic lib)
     }
 
-    filter "system:windows" --Tabulation doesnt mean anything, from this line below is applied only for windows
-        cppdialect "C++17"
-        staticruntime "On" --Links the run time libraries as static
+    filter "system:windows" --Tabulation doesnt mean anything, from this line below is applied only for windows 
         systemversion "latest"
 
         defines{
@@ -126,15 +119,12 @@ project "Sandbox"
 
     filter "configurations:Debug"
         defines "TL_DEBUG"
-        buildoptions "/MDd"
-        symbols "On"
+        symbols "on"
 
     filter "configurations:Release"
         defines "TL_RELEASE"
-        buildoptions "/MD"
-        optimize "On"
+        optimize "on"
 
     filter "configurations:Distribution"
         defines "TL_DISTRIBUTION"
-        buildoptions "/MD"
-        optimize "On"
+        optimize "on"

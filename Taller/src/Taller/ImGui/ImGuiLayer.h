@@ -3,7 +3,7 @@
 #include "Taller/Layer.h"
 
 namespace Taller {
-	class TALLER_API ImGuiLayer : public Layer{
+	class ImGuiLayer : public Layer{
 	public:
 		ImGuiLayer();
 		~ImGuiLayer();

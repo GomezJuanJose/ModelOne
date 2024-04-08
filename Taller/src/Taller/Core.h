@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef TL_PLATFORM_WINDOWS
+/*#ifdef TL_PLATFORM_WINDOWS
 	#ifdef TL_BUILD_DLL
 		#define TALLER_API __declspec(dllexport)
 	#else
@@ -9,7 +9,7 @@
 #else
 	#error Taller at the moment only supports Windows!
 #endif
-
+*/
 
 //TODO Create a own class of assertions
 #ifdef TL_ENABLE_ASSERTS
