@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Taller/Window.h"
+#include "Taller/Renderer/RenderContext.h"
 #include <GLFW/glfw3.h>
 
 namespace Taller {
@@ -28,6 +29,7 @@ namespace Taller {
 
 	private:
 		GLFWwindow* m_Window;
+		RenderContext* m_Context;
 
 		struct WindowData {
 			std::string Title;

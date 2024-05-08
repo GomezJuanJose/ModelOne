@@ -5,7 +5,9 @@
 #include "Taller/Events/KeyEvents.h"
 #include "Taller/Events/MouseEvents.h"
 
-#include <glad/glad.h>
+#include "Platform/OpenGL/OpenGLContext.h"
+
+
 
 namespace Taller {
 	static bool s_GLFWInitialized = false;
@@ -27,6 +29,8 @@ namespace Taller {
 		m_Data.Width = properties.Width;
 		m_Data.Height = properties.Height;
 
+		
+
 		if (!s_GLFWInitialized) {
 			int success = glfwInit();
 
@@ -39,10 +43,10 @@ namespace Taller {
 		}
 
 		m_Window = glfwCreateWindow((int)properties.Width, (int)properties.Height, properties.Title.c_str(), nullptr, nullptr);
-		glfwMakeContextCurrent(m_Window);
-
-		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-		TL_ASSERT(status, "Failed to initialize Glad!");
+		
+		m_Context = new OpenGLContext(m_Window);
+		m_Context->Init();
+	
 
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 		SetVSync(true);
@@ -138,7 +142,7 @@ namespace Taller {
 
 	void WindowsWindow::OnUpdate() {
 		glfwPollEvents();
-		glfwSwapBuffers(m_Window);
+		m_Context->SwapBuffers();
 	}
 
 	void WindowsWindow::SetVSync(bool enabled) {
