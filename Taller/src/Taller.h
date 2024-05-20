@@ -11,6 +11,15 @@
 
 #include "Taller/ImGui/ImGuiLayer.h"
 
+/*  --- RENDERER ---   */
+#include "Taller/Renderer/RenderCommand.h"
+#include "Taller/Renderer/Renderer.h"
+
+#include "Taller/Renderer/Buffer.h"
+#include "Taller/Renderer/Shader.h"
+#include "Taller/Renderer/VertexArray.h"
+/* ------------------- */
+
 /* -== ENTRY POINT ==- */
 #include "Taller/EntryPoint.h"
 /* -=================- */

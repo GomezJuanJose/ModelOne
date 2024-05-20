@@ -34,7 +34,7 @@ namespace Taller {
 		if (!s_GLFWInitialized) {
 			int success = glfwInit();
 
-			TL_ASSERT(!success, "Could not initialized GLFW")
+			TL_ASSERT(success, "Could not initialized GLFW")
 			TL_LOG_SUSCCESS(success, "Initialized GLFW");
 			
 			glfwSetErrorCallback(GLFWErrorCallback);
