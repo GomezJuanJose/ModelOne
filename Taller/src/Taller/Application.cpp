@@ -1,8 +1,8 @@
 #include "tlpch.h"
 #include "Application.h"
-#include <glad/glad.h>
 
 
+#include "GLFW/glfw3.h" //TODO fix timestep and remove this!!!
 
 //Explicar el porque de la excepcion de los dos heaps distintos cuando se accede desde un dll
 
@@ -31,8 +31,12 @@ namespace Taller {
 	void Application::Run() {
 		while (m_IsRunning) {
 
+			float time = glfwGetTime(); //TODO Search for "Fix Your Time Step"
+			Timestep timestep = time - m_LastFrameTime;
+			m_LastFrameTime = time;
+
 			for (Layer* layer : m_LayerStack) {
-				layer->OnUpdate();
+				layer->OnUpdate(timestep);
 			}
 
 

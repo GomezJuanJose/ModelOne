@@ -139,7 +139,10 @@ public:
 
 	};
 
-	void OnUpdate() override {
+	void OnUpdate(Taller::Timestep timestep) override {
+
+		TL_LOG_INFO(true, "%f", timestep.GetSeconds());
+
 		Taller::RenderCommand::SetClearColor({ 1.0f, 0.0f, 1.0f, 1.0f });
 		Taller::RenderCommand::Clear();
 		

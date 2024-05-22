@@ -12,6 +12,8 @@
 #include "Taller/ECS/ECS.h"
 #include "Taller/ECS/Components.h"
 
+#include "Taller/Core/Timestep.h"
+
 namespace Taller {
 	class Application {
 	public:
@@ -36,6 +38,9 @@ namespace Taller {
 
 	private:
 		bool m_IsRunning = true;
+
+		float m_LastFrameTime = 0.0f;
+
 		LayerStack m_LayerStack;
 		ImGuiLayer* m_ImGuiLayer;
 		std::unique_ptr<Window> m_Window;

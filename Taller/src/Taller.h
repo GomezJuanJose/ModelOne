@@ -5,6 +5,8 @@
 #include "Taller/Layer.h"
 #include "Taller/Log.h"
 
+#include "Taller/Core/Timestep.h"
+
 #include "Taller/ECS/ComponentOperations.h"
 
 #include "Taller/Input.h"
