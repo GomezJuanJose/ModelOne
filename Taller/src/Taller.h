@@ -5,6 +5,8 @@
 #include "Taller/Layer.h"
 #include "Taller/Log.h"
 
+#include "Taller/ECS/ComponentOperations.h"
+
 #include "Taller/Input.h"
 #include "Taller/KeyCodes.h"
 #include "Taller/MouseButtonCodes.h"
