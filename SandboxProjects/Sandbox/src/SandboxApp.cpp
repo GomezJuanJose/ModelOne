@@ -86,7 +86,7 @@ public:
 			}
 		)";
 
-		m_TriangleShader.reset(new Taller::Shader(triangleVertexSrc, triangleFragmentSrc));
+		m_TriangleShader.reset(Taller::Shader::Create(triangleVertexSrc, triangleFragmentSrc));
 
 
 		std::string squareVertexSrc = R"(
@@ -122,7 +122,7 @@ public:
 			}
 		)";
 
-		m_SquareShader.reset(new Taller::Shader(squareVertexSrc, squareFragmentSrc));
+		m_SquareShader.reset(Taller::Shader::Create(squareVertexSrc, squareFragmentSrc));
 
 
 		Taller::Entity camera = coord.CreateEntity();
