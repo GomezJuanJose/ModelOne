@@ -13,7 +13,7 @@ public:
 			 0.0f,  0.5f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f
 		};
 
-		std::shared_ptr<Taller::VertexBuffer> triangleVB;
+		Taller::AssetRef<Taller::VertexBuffer> triangleVB;
 		triangleVB.reset(Taller::VertexBuffer::Create(triangleVertices, sizeof(triangleVertices)));
 		Taller::BufferLayout triangleLayout = {
 			{Taller::ShaderDataType::Float3, "a_Position"},
@@ -23,7 +23,7 @@ public:
 		m_TriangleVA->AddVertexBuffer(triangleVB);
 
 		uint32_t triangleIndices[3] = { 0, 1, 2 };
-		std::shared_ptr<Taller::IndexBuffer> triangleIB;
+		Taller::AssetRef<Taller::IndexBuffer> triangleIB;
 		triangleIB.reset(Taller::IndexBuffer::Create(triangleIndices, sizeof(triangleIndices) / sizeof(uint32_t)));
 		m_TriangleVA->SetIndexBuffer(triangleIB);
 
@@ -37,7 +37,7 @@ public:
 			-0.75f,  0.75f, 0.0f
 		};
 
-		std::shared_ptr<Taller::VertexBuffer> squareVB;
+		Taller::AssetRef<Taller::VertexBuffer> squareVB;
 		squareVB.reset(Taller::VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
 		Taller::BufferLayout squareLayout = {
 			{Taller::ShaderDataType::Float3, "a_Position"}
@@ -46,7 +46,7 @@ public:
 		m_SquareVA->AddVertexBuffer(squareVB);
 
 		uint32_t squareIndices[6] = { 0, 1, 2, 2, 3, 0 };
-		std::shared_ptr<Taller::IndexBuffer> squareIB;
+		Taller::AssetRef<Taller::IndexBuffer> squareIB;
 		squareIB.reset(Taller::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
 		m_SquareVA->SetIndexBuffer(squareIB);
 
@@ -165,11 +165,11 @@ public:
 
 
 private:
-	std::shared_ptr<Taller::Shader> m_TriangleShader;
-	std::shared_ptr<Taller::VertexArray> m_TriangleVA;
+	Taller::AssetRef<Taller::Shader> m_TriangleShader;
+	Taller::AssetRef<Taller::VertexArray> m_TriangleVA;
 	
-	std::shared_ptr<Taller::Shader> m_SquareShader;
-	std::shared_ptr<Taller::VertexArray> m_SquareVA;
+	Taller::AssetRef<Taller::Shader> m_SquareShader;
+	Taller::AssetRef<Taller::VertexArray> m_SquareVA;
 
 	Taller::TransformComponent& transform = Taller::TransformComponent();
 	Taller::CameraComponent& cam = Taller::CameraComponent();

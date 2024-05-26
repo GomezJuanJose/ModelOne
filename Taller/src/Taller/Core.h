@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 /*#ifdef TL_PLATFORM_WINDOWS
 	#ifdef TL_BUILD_DLL
 		#define TALLER_API __declspec(dllexport)
@@ -21,3 +23,12 @@
 #endif
 
 #define BIT(x) (1 << x)
+
+
+namespace Taller {
+	template<typename T>
+	using AssetScope = std::unique_ptr<T>;
+
+	template<typename T>
+	using AssetRef = std::shared_ptr<T>;
+}
