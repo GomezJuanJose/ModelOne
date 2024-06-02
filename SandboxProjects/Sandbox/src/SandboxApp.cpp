@@ -86,10 +86,10 @@ public:
 			}
 		)";
 
-		m_TriangleShader.reset(Taller::Shader::Create(triangleVertexSrc, triangleFragmentSrc));
+		auto triangleShader = m_ShaderLibrary.Load("TriangleShader", triangleVertexSrc, triangleFragmentSrc);
 
 
-		m_SquareShader.reset(Taller::Shader::Create("assets/shaders/squareColor.glsl"));
+		auto squareShader = m_ShaderLibrary.Load("SquareShader", "assets/shaders/squareColor.glsl");
 
 
 		Taller::Entity camera = coord.CreateEntity();
@@ -102,7 +102,7 @@ public:
 		transform.location = glm::vec3(0.0f, 0.0f, 3.0f);
 		transform.rotation = glm::vec3(0.0f, 0.0f, 0.0f);
 
-		Taller::ComponentOperations::CalculateCameraViewProjection(cam, transform);
+		cam.viewProjection = Taller::ComponentOperations::CalculateCameraViewProjection(cam, transform);
 
 	};
 
@@ -115,8 +115,11 @@ public:
 		
 		Taller::Renderer::BeginScene(cam.viewProjection);
 
-			Taller::Renderer::Submit(m_SquareShader, m_SquareVA, glm::vec3(0.0f), glm::vec3(-55.0f, 10.0f, 45.0f));
-			Taller::Renderer::Submit(m_TriangleShader, m_TriangleVA);
+			auto squareShader = m_ShaderLibrary.Get("SquareShader");
+			Taller::Renderer::Submit(squareShader, m_SquareVA, glm::vec3(0.0f), glm::vec3(-55.0f, 10.0f, 45.0f));
+
+			auto triangleShader = m_ShaderLibrary.Get("TriangleShader");
+			Taller::Renderer::Submit(triangleShader, m_TriangleVA);
 
 		Taller::Renderer::EndScene();
 	}
@@ -132,10 +135,10 @@ public:
 
 
 private:
-	Taller::AssetRef<Taller::Shader> m_TriangleShader;
+	Taller::ShaderLibrary m_ShaderLibrary;
+
 	Taller::AssetRef<Taller::VertexArray> m_TriangleVA;
 	
-	Taller::AssetRef<Taller::Shader> m_SquareShader;
 	Taller::AssetRef<Taller::VertexArray> m_SquareVA;
 
 	Taller::TransformComponent& transform = Taller::TransformComponent();

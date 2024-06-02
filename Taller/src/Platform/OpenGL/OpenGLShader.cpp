@@ -25,9 +25,16 @@ namespace Taller {
 		std::string sourceCode = ReadFile(filePath);
 		std::unordered_map<GLenum, std::string> shaderSources = Preprocess(sourceCode);
 		Compile(shaderSources);
+
+		//Gets name from file path
+		auto lastSlash = filePath.find_last_of("/\\");
+		lastSlash = lastSlash == std::string::npos ? 0 : lastSlash + 1;
+		auto lastDot = filePath.rfind('.');
+		auto count = lastDot == std::string::npos ? filePath.size() - lastSlash : lastDot - lastSlash;
+		m_Name = filePath.substr(lastSlash, count);
 	}
 
-	OpenGLShader::OpenGLShader(const std::string& vertexSrc, const std::string& fragmentSrc) {
+	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc) : m_Name(name){
 		std::unordered_map<GLenum, std::string> sources;
 		sources[GL_VERTEX_SHADER] = vertexSrc;
 		sources[GL_FRAGMENT_SHADER] = fragmentSrc;
@@ -83,7 +90,7 @@ namespace Taller {
 
 	std::string OpenGLShader::ReadFile(const std::string& filePath) {
 		std::string result;
-		std::ifstream in(filePath, std::ios::in, std::ios::binary);
+		std::ifstream in(filePath, std::ios::in | std::ios::binary);
 
 		if (in) {
 			in.seekg(0, std::ios::end);
@@ -123,7 +130,9 @@ namespace Taller {
 	void OpenGLShader::Compile(const std::unordered_map<GLenum, std::string>& shaderSources) {
 
 		GLuint program = glCreateProgram();
-		std::vector<GLenum> glShaderIDs(shaderSources.size());
+		TL_ASSERT(shaderSources.size() <= 2, "At the moment it only supports 2 shaders");
+		std::array<GLenum, 2> glShaderIDs;
+		int glShaderIDIndex = 0;
 
 		for (auto& kv : shaderSources) {
 			GLenum type = kv.first;
@@ -153,7 +162,7 @@ namespace Taller {
 			}
 
 			glAttachShader(program, shader);
-			glShaderIDs.push_back(shader);
+			glShaderIDs[glShaderIDIndex++] = shader;
 		}	
 
 		//To this point the shaders are compiled susccessfully, now it needs to be linked to a program
