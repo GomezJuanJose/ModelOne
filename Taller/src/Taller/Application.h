@@ -34,10 +34,12 @@ namespace Taller {
 
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
+		bool OnWindowResize(WindowResizeEvent& e);
 
 
 	private:
 		bool m_IsRunning = true;
+		bool m_IsMinimize = false;
 
 		float m_LastFrameTime = 0.0f;
 

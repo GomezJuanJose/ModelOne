@@ -1,6 +1,6 @@
 #include "tlpch.h"
 #include "Application.h"
-
+#include "Taller/Renderer/Renderer.h"
 
 #include "GLFW/glfw3.h" //TODO fix timestep and remove this!!!
 
@@ -21,6 +21,8 @@ namespace Taller {
 
 		m_Coordinator = std::make_unique<Coordinator>();
 
+		Renderer::Init();
+
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);	
 	}
@@ -35,8 +37,10 @@ namespace Taller {
 			Timestep timestep = time - m_LastFrameTime;
 			m_LastFrameTime = time;
 
-			for (Layer* layer : m_LayerStack) {
-				layer->OnUpdate(timestep);
+			if (!m_IsMinimize) {
+				for (Layer* layer : m_LayerStack) {
+					layer->OnUpdate(timestep);
+				}
 			}
 
 
@@ -55,6 +59,7 @@ namespace Taller {
 	void Application::OnEvent(Event& e) {
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FUNCTION(OnWindowClose));
+		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FUNCTION(OnWindowResize));
 
 		TL_LOG_INFO(true, e.ToString());
 
@@ -69,6 +74,18 @@ namespace Taller {
 	bool Application::OnWindowClose(WindowCloseEvent& e) {
 		m_IsRunning = false;
 		return true;
+	}
+
+	bool Application::OnWindowResize(WindowResizeEvent& e) {
+		
+		if (e.GetWidth() == 0.0f || e.GetHeight() == 0.0f) {
+			m_IsMinimize = true;
+		}
+
+		m_IsMinimize = false;
+		Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
+
+		return false;
 	}
 
 	void Application::PushLayer(Layer* layer) {
