@@ -6,7 +6,7 @@
 #include "Taller/Events/Event.h"
 #include "Taller/Events/ApplicationEvents.h"
 
-#include "Taller/LayerStack.h"
+#include "Taller/Core/LayerStack.h"
 #include "Taller/ImGui/ImGuiLayer.h"
 
 #include "Taller/ECS/ECS.h"

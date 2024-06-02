@@ -9,7 +9,7 @@
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3_loader.h"
 
-#include "Taller/Application.h"
+#include "Taller/Core/Application.h"
 
 namespace Taller {
 	ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer") {

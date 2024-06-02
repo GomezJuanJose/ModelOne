@@ -17,7 +17,7 @@ namespace Taller {
 		glm::mat4 projection;
 		glm::mat4 viewProjection;
 
-		CameraComponent(float fov = 45.0f, float aspectRatio = 1.7f, float nearPlane = 0.1f, float farPlane = 100.0f) : projection(glm::perspective(glm::radians(fov), aspectRatio, nearPlane, farPlane)) {
+		CameraComponent(float fov = 45.0f, float aspectRatio = 1.7f, float nearPlane = 0.1f, float farPlane = 100.0f) : projection(glm::perspective(glm::radians(fov), aspectRatio, nearPlane, farPlane)), viewProjection(glm::mat4(1.0f)) {
 		}
 	};
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Taller/Input.h"
+#include "Taller/Core/Input.h"
 
 namespace Taller {
 	class WindowsInput : public Input {

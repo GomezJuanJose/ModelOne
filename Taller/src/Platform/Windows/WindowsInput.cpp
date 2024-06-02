@@ -1,7 +1,7 @@
 #include "tlpch.h"
 #include "WindowsInput.h"
 
-#include "Taller/Application.h"
+#include "Taller/Core/Application.h"
 #include <GLFW/glfw3.h>
 
 namespace Taller {

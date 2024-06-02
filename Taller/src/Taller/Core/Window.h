@@ -2,8 +2,8 @@
 
 #include "tlpch.h"
 
-#include "Taller\Core.h"
-#include "Taller\Events\Event.h"
+#include "Taller/Core/Core.h"
+#include "Taller/Events/Event.h"
 
 namespace Taller {
 	struct WindowProperties {

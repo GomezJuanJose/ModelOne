@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Taller/Window.h"
+#include "Taller/Core/Window.h"
 #include "Taller/Renderer/RenderContext.h"
 #include <GLFW/glfw3.h>
 

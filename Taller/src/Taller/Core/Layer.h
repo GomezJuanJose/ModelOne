@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Taller/Core.h"
+#include "Taller/Core/Core.h"
 #include "Taller/Events/Event.h"
 #include "Taller/Core/Timestep.h"
 
