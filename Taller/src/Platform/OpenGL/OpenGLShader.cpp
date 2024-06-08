@@ -22,6 +22,9 @@ namespace Taller {
 	}
 	
 	OpenGLShader::OpenGLShader(const std::string& filePath) {
+
+		TL_PROFILE_RENDERER_FUNCTION();
+
 		std::string sourceCode = ReadFile(filePath);
 		std::unordered_map<GLenum, std::string> shaderSources = Preprocess(sourceCode);
 		Compile(shaderSources);
@@ -35,6 +38,9 @@ namespace Taller {
 	}
 
 	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc) : m_Name(name){
+
+		TL_PROFILE_RENDERER_FUNCTION();
+
 		std::unordered_map<GLenum, std::string> sources;
 		sources[GL_VERTEX_SHADER] = vertexSrc;
 		sources[GL_FRAGMENT_SHADER] = fragmentSrc;
@@ -42,14 +48,23 @@ namespace Taller {
 	}
 
 	OpenGLShader::~OpenGLShader() {
+
+		TL_PROFILE_RENDERER_FUNCTION();
+
 		glDeleteProgram(m_RendererID);
 	}
 
 	void OpenGLShader::Bind() const {
+
+		TL_PROFILE_RENDERER_FUNCTION();
+
 		glUseProgram(m_RendererID);
 	}
 
 	void OpenGLShader::Unbind() const {
+
+		TL_PROFILE_RENDERER_FUNCTION();
+
 		glUseProgram(0);
 	}
 
@@ -89,6 +104,9 @@ namespace Taller {
 	}
 
 	std::string OpenGLShader::ReadFile(const std::string& filePath) {
+
+		TL_PROFILE_RENDERER_FUNCTION();
+
 		std::string result;
 		std::ifstream in(filePath, std::ios::in | std::ios::binary);
 
@@ -106,7 +124,9 @@ namespace Taller {
 		return result;
 	}
 	std::unordered_map<GLenum, std::string> OpenGLShader::Preprocess(const std::string& source) {
-		
+
+		TL_PROFILE_RENDERER_FUNCTION();
+
 		std::unordered_map<GLenum, std::string> shaderSources;
 
 		const char* typeToken = "#type";
@@ -128,6 +148,8 @@ namespace Taller {
 		return shaderSources;
 	}
 	void OpenGLShader::Compile(const std::unordered_map<GLenum, std::string>& shaderSources) {
+
+		TL_PROFILE_RENDERER_FUNCTION();
 
 		GLuint program = glCreateProgram();
 		TL_ASSERT(shaderSources.size() <= 2, "At the moment it only supports 2 shaders");

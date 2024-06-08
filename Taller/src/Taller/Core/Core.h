@@ -24,6 +24,8 @@
 
 #define BIT(x) (1 << x)
 
+#define TL_PROFILE 1
+#define TL_PROFILE_RENDERER 1
 
 namespace Taller {
 	template<typename T>

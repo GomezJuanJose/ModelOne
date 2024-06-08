@@ -8,6 +8,9 @@ namespace Taller {
 	Renderer::SceneData* Renderer::m_SceneData = new Renderer::SceneData;
 
 	void Renderer::Init() {
+		
+		TL_PROFILE_FUNCTION();
+
 		RenderCommand::Init();
 	}
 

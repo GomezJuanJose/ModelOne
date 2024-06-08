@@ -13,6 +13,10 @@ namespace Taller {
 	Application* Application::s_Instance = nullptr;
 	
 	Application::Application() {
+
+		TL_PROFILE_FUNCTION();
+
+
 		TL_ASSERT(!s_Instance, "Application already exists!");
 		s_Instance = this;
 
@@ -28,9 +32,15 @@ namespace Taller {
 	}
 
 	Application::~Application() {
+
+		TL_PROFILE_FUNCTION();
+
 	}
 
 	void Application::Run() {
+
+		TL_PROFILE_FUNCTION();
+
 		while (m_IsRunning) {
 
 			float time = glfwGetTime(); //TODO Search for "Fix Your Time Step"
@@ -38,8 +48,12 @@ namespace Taller {
 			m_LastFrameTime = time;
 
 			if (!m_IsMinimize) {
-				for (Layer* layer : m_LayerStack) {
-					layer->OnUpdate(timestep);
+				{
+					TL_PROFILE_SCOPE("LayerStack->OnUpdate");
+
+					for (Layer* layer : m_LayerStack) {
+						layer->OnUpdate(timestep);
+					}
 				}
 			}
 
@@ -57,6 +71,9 @@ namespace Taller {
 	}
 
 	void Application::OnEvent(Event& e) {
+
+		TL_PROFILE_FUNCTION();
+
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FUNCTION(OnWindowClose));
 		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FUNCTION(OnWindowResize));
@@ -77,7 +94,9 @@ namespace Taller {
 	}
 
 	bool Application::OnWindowResize(WindowResizeEvent& e) {
-		
+
+		TL_PROFILE_FUNCTION();
+
 		if (e.GetWidth() == 0.0f || e.GetHeight() == 0.0f) {
 			m_IsMinimize = true;
 		}
@@ -89,11 +108,17 @@ namespace Taller {
 	}
 
 	void Application::PushLayer(Layer* layer) {
+
+		TL_PROFILE_FUNCTION();
+
 		m_LayerStack.PushLayer(layer);
 		layer->OnAttach();
 	}
 
 	void Application::PushOverlay(Layer* overlay) {
+
+		TL_PROFILE_FUNCTION();
+
 		m_LayerStack.PushOverlay(overlay);
 		overlay->OnAttach();
 	}

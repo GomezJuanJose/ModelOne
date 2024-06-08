@@ -18,6 +18,6 @@ namespace Taller {
 		virtual const std::vector<AssetRef<VertexBuffer>>& GetVertexBuffers() const = 0;
 		virtual const AssetRef<IndexBuffer>& GetIndexBuffer() const = 0;
 
-		static VertexArray* Create();
+		static AssetRef<VertexArray> Create();
 	};
 }

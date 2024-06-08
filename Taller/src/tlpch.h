@@ -14,4 +14,5 @@
 #include <unordered_set>
 
 
-#include "Taller/Core/Log.h"
+#include "Taller/Debug/Log.h"
+#include "Taller/Debug/Instrumentor.h"

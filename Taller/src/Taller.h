@@ -3,7 +3,7 @@
 #include "tlpch.h" //TODO This is because std is not found in others .h files and gives error to compile. Find more info
 #include "Taller/Core/Application.h"
 #include "Taller/Core/Layer.h"
-#include "Taller/Core/Log.h"
+#include "Taller/Debug/Log.h"
 
 #include "Taller/Core/Timestep.h"
 
@@ -23,7 +23,3 @@
 #include "Taller/Renderer/Shader.h"
 #include "Taller/Renderer/VertexArray.h"
 /* ------------------- */
-
-/* -== ENTRY POINT ==- */
-#include "Taller/Core/EntryPoint.h"
-/* -=================- */

@@ -1,11 +1,12 @@
 #include <Taller.h>
+#include <Taller/Core/EntryPoint.h>
 
 #include "ImGui/imgui.h"
 
 class ExampleLayer : public Taller::Layer {
 public:
 	ExampleLayer() : Layer("Example") {
-		m_TriangleVA.reset(Taller::VertexArray::Create());
+		m_TriangleVA = Taller::VertexArray::Create();
 
 		float triangleVertices[3 * 7] = {
 			-0.5f, -0.5f, 0.0f, 0.8f, 0.2f, 0.8f, 1.0f,
@@ -28,7 +29,7 @@ public:
 		m_TriangleVA->SetIndexBuffer(triangleIB);
 
 		
-		m_SquareVA.reset(Taller::VertexArray::Create());
+		m_SquareVA = Taller::VertexArray::Create();
 
 		float squareVertices[4 * 3] = {
 			-0.75f, -0.75f, 0.0f,
@@ -102,26 +103,34 @@ public:
 		transform.location = glm::vec3(0.0f, 0.0f, 3.0f);
 		transform.rotation = glm::vec3(0.0f, 0.0f, 0.0f);
 
-		cam.viewProjection = Taller::ComponentOperations::CalculateCameraViewProjection(cam, transform);
 
+		cam.viewProjection = Taller::ComponentOperations::CalculateCameraViewProjection(cam, transform);
 	};
 
 	void OnUpdate(Taller::Timestep timestep) override {
 
-		TL_LOG_INFO(true, "%f", timestep.GetSeconds());
+		TL_PROFILE_FUNCTION();
 
-		Taller::RenderCommand::SetClearColor({ 1.0f, 0.0f, 1.0f, 1.0f });
-		Taller::RenderCommand::Clear();
-		
-		Taller::Renderer::BeginScene(cam.viewProjection);
 
-			auto squareShader = m_ShaderLibrary.Get("SquareShader");
-			Taller::Renderer::Submit(squareShader, m_SquareVA, glm::vec3(0.0f), glm::vec3(-55.0f, 10.0f, 45.0f));
+		{
+			TL_PROFILE_SCOPE("Render preparation");
+			Taller::RenderCommand::SetClearColor({ 1.0f, 0.0f, 1.0f, 1.0f });
+			Taller::RenderCommand::Clear();
+		}
 
-			auto triangleShader = m_ShaderLibrary.Get("TriangleShader");
-			Taller::Renderer::Submit(triangleShader, m_TriangleVA);
+		{
+			TL_PROFILE_SCOPE("Render");
 
-		Taller::Renderer::EndScene();
+			Taller::Renderer::BeginScene(cam.viewProjection);
+
+				auto squareShader = m_ShaderLibrary.Get("SquareShader");
+				Taller::Renderer::Submit(squareShader, m_SquareVA, glm::vec3(0.0f), glm::vec3(-55.0f, 10.0f, 45.0f));
+
+				auto triangleShader = m_ShaderLibrary.Get("TriangleShader");
+				Taller::Renderer::Submit(triangleShader, m_TriangleVA);
+
+			Taller::Renderer::EndScene();
+		}
 	}
 
 	void OnEvent(Taller::Event& e) override {
@@ -129,6 +138,8 @@ public:
 	}
 
 	virtual void OnImGuiRender() override {
+		TL_PROFILE_FUNCTION();
+
 		static bool show = true;
 		ImGui::ShowDemoWindow(&show);
 	}

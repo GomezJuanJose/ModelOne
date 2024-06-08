@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core.h"
+#include "Taller/Core/Core.h"
 
 
 // TODO: Implement loggin basics. Needs to print a message with a category, n argumenst with x color and check if prints it given a bool.

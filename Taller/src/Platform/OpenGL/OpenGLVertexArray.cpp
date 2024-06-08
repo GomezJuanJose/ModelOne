@@ -24,23 +24,37 @@ namespace Taller {
 	}
 
 	OpenGLVertexArray::OpenGLVertexArray() {
+		
+		TL_PROFILE_RENDERER_FUNCTION();
+
 		glCreateVertexArrays(1, &m_RendererID);
 	}
 
 	OpenGLVertexArray::~OpenGLVertexArray() {
+
+		TL_PROFILE_RENDERER_FUNCTION();
+
 		glDeleteVertexArrays(1, &m_RendererID);
 	}
 
 	void OpenGLVertexArray::Bind() const {
+
+		TL_PROFILE_RENDERER_FUNCTION();
+
 		glBindVertexArray(m_RendererID);
 	}
 
 	void OpenGLVertexArray::Unbind() const {
+
+		TL_PROFILE_RENDERER_FUNCTION();
+
 		glBindVertexArray(0);
 	}
 
 	void OpenGLVertexArray::AddVertexBuffer(const AssetRef<VertexBuffer>& vertexBuffer) {
-		
+
+		TL_PROFILE_RENDERER_FUNCTION();
+
 		TL_ASSERT(vertexBuffer->GetLayout().GetElements().size(), "Vertex buffer has no layouts!!!");
 		
 		glBindVertexArray(m_RendererID);
@@ -66,6 +80,9 @@ namespace Taller {
 	}
 
 	void OpenGLVertexArray::SetIndexBuffer(const AssetRef<IndexBuffer>& indexBuffer) {
+
+		TL_PROFILE_RENDERER_FUNCTION();
+
 		glBindVertexArray(m_RendererID);
 		indexBuffer->Bind();
 

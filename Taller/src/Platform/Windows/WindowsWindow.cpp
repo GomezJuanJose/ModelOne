@@ -25,6 +25,9 @@ namespace Taller {
 	}
 
 	void WindowsWindow::Init(const WindowProperties& properties) {
+
+		TL_PROFILE_FUNCTION();
+
 		m_Data.Title = properties.Title;
 		m_Data.Width = properties.Width;
 		m_Data.Height = properties.Height;
@@ -32,6 +35,9 @@ namespace Taller {
 		
 
 		if (!s_GLFWInitialized) {
+
+			TL_PROFILE_SCOPE("glfwInit();");
+
 			int success = glfwInit();
 
 			TL_ASSERT(success, "Could not initialized GLFW")
@@ -42,8 +48,12 @@ namespace Taller {
 			s_GLFWInitialized = true;
 		}
 
-		m_Window = glfwCreateWindow((int)properties.Width, (int)properties.Height, properties.Title.c_str(), nullptr, nullptr);
-		
+		{
+			TL_PROFILE_SCOPE("glfwCreateWindow((int)properties.Width, (int)properties.Height, properties.Title.c_str(), nullptr, nullptr);");
+
+			m_Window = glfwCreateWindow((int)properties.Width, (int)properties.Height, properties.Title.c_str(), nullptr, nullptr);
+		}
+
 		m_Context = new OpenGLContext(m_Window);
 		m_Context->Init();
 	
@@ -137,15 +147,24 @@ namespace Taller {
 	}
 
 	void WindowsWindow::Shutdown() {
+
+		TL_PROFILE_FUNCTION();
+
 		glfwDestroyWindow(m_Window);
 	}
 
 	void WindowsWindow::OnUpdate() {
+
+		TL_PROFILE_FUNCTION();
+
 		glfwPollEvents();
 		m_Context->SwapBuffers();
 	}
 
 	void WindowsWindow::SetVSync(bool enabled) {
+
+		TL_PROFILE_FUNCTION();
+
 		if (enabled) {
 			glfwSwapInterval(1);
 		}
