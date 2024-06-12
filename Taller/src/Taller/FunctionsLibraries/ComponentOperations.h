@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Components.h"
+#include "Taller/ECS/Components.h"
 
 namespace Taller {
 	class ComponentOperations {

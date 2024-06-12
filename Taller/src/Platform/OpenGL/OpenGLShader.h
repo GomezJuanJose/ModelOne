@@ -29,7 +29,6 @@ namespace Taller {
 		void UploadUniformMat4(const std::string& name, const glm::mat4& matrix);
 
 	private:
-		std::string ReadFile(const std::string& filePath); // TODO Redo with a proper file system with virtual files
 		std::unordered_map<GLenum, std::string> Preprocess(const std::string& source);
 		void Compile(const std::unordered_map<GLenum, std::string>& shaderSources);
 

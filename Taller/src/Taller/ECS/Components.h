@@ -3,6 +3,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "Taller/Renderer/VertexArray.h"
+
 namespace Taller {
 	struct TransformComponent {
 		glm::vec3 location;
@@ -18,6 +20,14 @@ namespace Taller {
 		glm::mat4 viewProjection;
 
 		CameraComponent(float fov = 45.0f, float aspectRatio = 1.7f, float nearPlane = 0.1f, float farPlane = 100.0f) : projection(glm::perspective(glm::radians(fov), aspectRatio, nearPlane, farPlane)), viewProjection(glm::mat4(1.0f)) {
+		}
+	};
+
+	struct StaticMeshComponent {
+		std::string shaderName; // TODO Use material system
+		std::string meshName;
+
+		StaticMeshComponent(const std::string& shaderName = "", const std::string& meshName = "") : shaderName(shaderName), meshName(meshName) {
 		}
 	};
 }

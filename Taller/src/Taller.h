@@ -7,13 +7,15 @@
 
 #include "Taller/Core/Timestep.h"
 
-#include "Taller/ECS/ComponentOperations.h"
+#include "Taller/FunctionsLibraries/ComponentOperations.h"
 
 #include "Taller/Core/Input.h"
 #include "Taller/Core/KeyCodes.h"
 #include "Taller/Core/MouseButtonCodes.h"
 
 #include "Taller/ImGui/ImGuiLayer.h"
+
+#include "Taller/FunctionsLibraries/FileOperations.h"
 
 /*  --- RENDERER ---   */
 #include "Taller/Renderer/RenderCommand.h"
@@ -22,4 +24,6 @@
 #include "Taller/Renderer/Buffer.h"
 #include "Taller/Renderer/Shader.h"
 #include "Taller/Renderer/VertexArray.h"
+
+#include "Taller/Renderer/Mesh.h"
 /* ------------------- */

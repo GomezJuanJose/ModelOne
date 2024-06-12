@@ -1,7 +1,7 @@
 #include "tlpch.h"
 #include "OpenGLShader.h"
 
-#include <fstream>
+#include "Taller/FunctionsLibraries/FileOperations.h"
 
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -25,7 +25,7 @@ namespace Taller {
 
 		TL_PROFILE_RENDERER_FUNCTION();
 
-		std::string sourceCode = ReadFile(filePath);
+		std::string sourceCode = FileOperations::ReadFile(filePath);
 		std::unordered_map<GLenum, std::string> shaderSources = Preprocess(sourceCode);
 		Compile(shaderSources);
 
@@ -103,26 +103,7 @@ namespace Taller {
 		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
 
-	std::string OpenGLShader::ReadFile(const std::string& filePath) {
-
-		TL_PROFILE_RENDERER_FUNCTION();
-
-		std::string result;
-		std::ifstream in(filePath, std::ios::in | std::ios::binary);
-
-		if (in) {
-			in.seekg(0, std::ios::end);
-			result.resize(in.tellg());
-			in.seekg(0, std::ios::beg);
-			in.read(&result[0], result.size());
-			in.close();
-		}
-		else {
-			TL_LOG_ERROR("Could not open file %s", filePath);
-		}
-
-		return result;
-	}
+	
 	std::unordered_map<GLenum, std::string> OpenGLShader::Preprocess(const std::string& source) {
 
 		TL_PROFILE_RENDERER_FUNCTION();
