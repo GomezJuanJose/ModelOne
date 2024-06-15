@@ -17,6 +17,7 @@ IncludeDir["GLFW"] = "Taller/vendor/GLFW/include"
 IncludeDir["Glad"] = "Taller/vendor/Glad/include"
 IncludeDir["ImGui"] = "Taller/vendor/ImGui"
 IncludeDir["glm"] = "Taller/vendor/glm"
+IncludeDir["stb_image"] = "Taller/vendor/stb_image"
 
 group "Dependencies"
     include "Taller/vendor/GLFW"
@@ -41,6 +42,8 @@ project "Taller"
     files{
         "%{prj.name}/src/**.h",
         "%{prj.name}/src/**.cpp",
+        "%{prj.name}/vendor/stb_image/**.h",
+        "%{prj.name}/vendor/stb_image/**.cpp",
     }
 
     includedirs{
@@ -48,7 +51,8 @@ project "Taller"
         "%{IncludeDir.GLFW}",
         "%{IncludeDir.Glad}",
         "%{IncludeDir.ImGui}",
-        "%{IncludeDir.glm}"
+        "%{IncludeDir.glm}",
+        "%{IncludeDir.stb_image}"
         --Use for third parties libs in this case
         --"%{prj.name}/vendor/THIRD_PARTY_LIB/include"
     }

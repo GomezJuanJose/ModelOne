@@ -28,18 +28,20 @@ namespace Taller {
 		Taller::BufferLayout triangleLayout = {
 			{Taller::ShaderDataType::Float3, "a_Position"},
 			{Taller::ShaderDataType::Float3, "a_Normal"},
-			{Taller::ShaderDataType::Float2, "a_Texture"}
+			{Taller::ShaderDataType::Float2, "a_Texcoord"}
 		};
 		vertexBuffer->SetLayout(triangleLayout);
 		vertexArray->AddVertexBuffer(vertexBuffer);
+		
 
 
 		AssetRef<IndexBuffer> indexBuffer;
 		indexBuffer.reset(IndexBuffer::Create(&indices[0], vertices.size() * sizeof(uint32_t) / sizeof(uint32_t)));
 		vertexArray->SetIndexBuffer(indexBuffer);
-
+		
 
 		Add(name, vertexArray);
+
 
 		return vertexArray;
 

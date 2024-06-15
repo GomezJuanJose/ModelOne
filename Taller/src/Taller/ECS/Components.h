@@ -24,10 +24,11 @@ namespace Taller {
 	};
 
 	struct StaticMeshComponent {
-		std::string shaderName; // TODO Use material system
+		std::string shaderName; // TODO Use material system!!!
+		std::string textureName;// TODO Use material system!!!
 		std::string meshName;
 
-		StaticMeshComponent(const std::string& shaderName = "", const std::string& meshName = "") : shaderName(shaderName), meshName(meshName) {
+		StaticMeshComponent(const std::string& shaderName = "", const std::string& textureName = "", const std::string & meshName = "") : shaderName(shaderName), textureName(textureName), meshName(meshName) {
 		}
 	};
 }

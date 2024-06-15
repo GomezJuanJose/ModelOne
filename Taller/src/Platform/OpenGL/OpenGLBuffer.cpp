@@ -3,6 +3,8 @@
 
 #include <glad/glad.h>
 
+
+
 namespace Taller {
 	/*-------------------------- VERTEX BUFFER --------------------------*/
 

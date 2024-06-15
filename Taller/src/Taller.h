@@ -26,4 +26,5 @@
 #include "Taller/Renderer/VertexArray.h"
 
 #include "Taller/Renderer/Mesh.h"
+#include "Taller/Renderer/Texture.h"
 /* ------------------- */

@@ -1,7 +1,8 @@
 #pragma once
 
 #include "RenderCommand.h"
-#include "Shader.h"
+#include "Taller/Renderer/Shader.h"
+#include "Taller/Renderer/Texture.h"
 #include "Taller/ECS/Components.h"
 
 namespace Taller {
@@ -16,6 +17,7 @@ namespace Taller {
 		static void EndScene();
 
 		static void Submit(const AssetRef<Shader>& shader, const AssetRef<VertexArray>& vertexArray, const glm::vec3& location = glm::vec3(0.0f), const glm::vec3& rotation = glm::vec3(0.0f), const glm::vec3& scale = glm::vec3(1.0f));
+		static void Submit(const AssetRef<Shader>& shader, const AssetRef<Texture>& texture, const AssetRef<VertexArray>& vertexArray, const glm::vec3& location = glm::vec3(0.0f), const glm::vec3& rotation = glm::vec3(0.0f), const glm::vec3& scale = glm::vec3(1.0f));
 
 		inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 
