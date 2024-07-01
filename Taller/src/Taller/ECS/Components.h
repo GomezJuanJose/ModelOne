@@ -31,4 +31,21 @@ namespace Taller {
 		StaticMeshComponent(const std::string& shaderName = "", const std::string& textureName = "", const std::string & meshName = "") : shaderName(shaderName), textureName(textureName), meshName(meshName) {
 		}
 	};
+
+	struct AmbientLightComponent {
+		glm::vec3 color;
+		float intensity;
+
+		AmbientLightComponent(glm::vec3 color = glm::vec3(1.0f), float intensity = 0.5f) : color(color), intensity(intensity) {
+		}
+	};
+
+	struct DirectionalLightComponent {
+		glm::vec3 color;
+		glm::vec3 direction;
+		float intensity;
+
+		DirectionalLightComponent(glm::vec3 direction = glm::vec3(0.0f), glm::vec3 color = glm::vec3(1.0f), float intensity = 1.0f) : direction(direction), color(color), intensity(intensity) {
+		}
+	};
 }

@@ -100,7 +100,7 @@ namespace Taller{
 	}
 
 	bool Coordinator::EntityBelongsToGroup(Entity entity, const std::string& group) const {
-		return m_GroupPerEntities.at(entity.GetId()).compare(group) == 0;					//Not handles if the users inserts a wrong group name that was not proviously added because is O(N)
+		return m_GroupPerEntities.at(entity.GetId()).compare(group) == 0;					//Not handles if the users inserts a wrong group name that was not previously added because is O(N)
 	}
 
 	std::set<Entity> Coordinator::GetEntitiesByGroup(const std::string& group) const {
