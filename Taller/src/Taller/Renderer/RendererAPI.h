@@ -21,6 +21,7 @@ namespace Taller {
 		virtual void Clear() = 0;
 
 		virtual void DrawIndexed(const AssetRef<VertexArray>& vertexArray) = 0;
+		virtual void BindTextureUnit(const uint32_t unit, const uint32_t texture) = 0;
 	
 		inline static API GetAPI() { return s_API; }
 	private:

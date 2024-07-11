@@ -26,6 +26,10 @@ namespace Taller{
 			s_RendererAPI->DrawIndexed(vertexArray);
 		}
 
+		inline static void BindTextureUnit(const uint32_t unit, const uint32_t texture) {
+			s_RendererAPI->BindTextureUnit(unit, texture);
+		}
+
 
 	private:
 		static RendererAPI* s_RendererAPI;

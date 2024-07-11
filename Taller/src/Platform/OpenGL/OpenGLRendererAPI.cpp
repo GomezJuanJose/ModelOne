@@ -32,4 +32,7 @@ namespace Taller {
 	void OpenGLRendererAPI::DrawIndexed(const AssetRef<VertexArray>& vertexArray) {
 		glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
+	void OpenGLRendererAPI::BindTextureUnit(const uint32_t unit, const uint32_t texture) {
+		glBindTextureUnit(unit, texture);
+	}
 }

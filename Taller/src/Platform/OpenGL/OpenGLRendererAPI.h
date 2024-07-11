@@ -13,5 +13,6 @@ namespace Taller {
 		virtual void Clear() override;
 
 		virtual void DrawIndexed(const AssetRef<VertexArray>& vertexArray) override;
+		virtual void BindTextureUnit(const uint32_t unit, const uint32_t texture) override;
 	};
 }

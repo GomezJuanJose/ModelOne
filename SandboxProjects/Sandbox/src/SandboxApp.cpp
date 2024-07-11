@@ -10,6 +10,15 @@
 //TODO Valorar si compensa hacer una plantilla AssetLibrary<T>
 //TODO Revisar sistema de coordenadas (si son cm o m)
 
+//TODO Hacer traduccion de grados a una direccion vec3 para la directional light
+//TODO Que la proyeccion ortogonal mire en la misma direccion que la directional light
+
+//TODO Mejorar la formula del bias para el shadow acne
+//TODO Buscar una mejor forma para resolver el peter panning, no usar front face culling porque se carga los planos y eso en algunos casos no es de interes(como el modelado)
+//TODO Sincronizar la iluminacion difusa con el casteo de sombras (que vaya a la misma direccion)
+
+//TODO Hacer que solo haga una vez el calculo de la direccion de la luz
+
 #pragma region PLACE_HOLDER_DATA
 std::string triangleVertexSrc = R"(
 
@@ -23,11 +32,15 @@ std::string triangleVertexSrc = R"(
 			uniform mat4 u_ModelMatrix;
 			uniform mat3 u_NormalMatrix;
 
+			uniform mat4 u_LightSpaceMatrix; // For shadow map
+
 			out vec3 v_Position;
 			out vec3 v_Normal;
 			out vec2 v_Texcoord;
 
 			out vec3 v_FragmentPosition;
+
+			out vec4 v_FragPosLightSpace; // For shadow map
 
 			void main(){
 				v_Position = a_Position;
@@ -35,6 +48,8 @@ std::string triangleVertexSrc = R"(
 				v_Texcoord = a_Texcoord;
 				
 				v_FragmentPosition = vec3(u_ModelMatrix * vec4(v_Position, 1.0));
+
+				v_FragPosLightSpace = u_LightSpaceMatrix * vec4(v_FragmentPosition, 1.0);
 
 				gl_Position = u_ProjectionViewMatrix * u_ModelMatrix * vec4(v_Position, 1.0);
 			}
@@ -52,7 +67,10 @@ std::string triangleFragmentSrc = R"(
 
 			in vec3 v_FragmentPosition;
 
+			in vec4 v_FragPosLightSpace;
+
 			uniform sampler2D u_Texture;
+			uniform sampler2D u_ShadowMap;
 
 			uniform vec3 u_AmbientLightColor;
 			uniform float u_AmbientLightIntensity;
@@ -60,6 +78,47 @@ std::string triangleFragmentSrc = R"(
 			uniform vec3 u_DiffuseLightDirection;
 			uniform vec3 u_DiffuseLightColor;
 			uniform float u_DiffuseLightIntensity;
+
+
+			float ShadowCalculation(vec4 fragPosLightSpace){
+				//Perform perspective divide
+				vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+				
+				//Transforms NDC to range [0,1]
+				projCoords = projCoords * 0.5 + 0.5;
+
+
+				//Avoids oversampling by fustrum side
+				if (projCoords.z > 1.0){
+					return 0.0;
+				}
+
+
+				float closestDepth = texture(u_ShadowMap, projCoords.xy).r;
+				float currentDepth = projCoords.z;
+				
+				//Prevents shadow acne
+				vec3 normal = v_Normal;
+				vec3 lightDir = normalize(u_DiffuseLightDirection);
+				float bias = max(0.05 * (1.0 - dot(normal,lightDir)), 0.005);
+
+				float shadow = 0.0;
+				vec2 texelSize = 1.0 / textureSize(u_ShadowMap, 0);
+				for(int x = -1; x <= 1; ++x){
+					for(int y = -1; y <= 1; ++y){
+						float pcfDepth = texture(u_ShadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
+						shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
+					}
+				}
+				shadow /= 9.0;
+
+				//float shadow = currentDepth - bias > closestDepth ? 1.0f : 0.0f;
+
+				
+
+				return shadow;
+			}
+
 
 			void main(){
 				vec4 c = texture(u_Texture, v_Texcoord);
@@ -71,15 +130,19 @@ std::string triangleFragmentSrc = R"(
 			
 				//Directional light
 				vec3 normal = normalize(v_Normal);
+
 				/*this is more for a point light like ilumination*/
 				//vec3 lightDirection = normalize(u_DiffuseLightDirection - v_FragmentPosition);
 				//float diffuse = max(dot(normal, lightDirection), 0.0);
 
-				float diffuse = max(dot(normal, -u_DiffuseLightDirection), 0.0);
+				vec3 lightDirection = normalize(u_DiffuseLightDirection);
+				float diffuse = max(dot(normal, lightDirection), 0.0);
 				vec3 diffuseLight = diffuse * u_DiffuseLightColor * u_DiffuseLightIntensity;
 			
+				//Shadows
+				float shadow = ShadowCalculation(v_FragPosLightSpace);
 
-				color = c * vec4(ambientLight + diffuseLight, 1.0);
+				color = c * vec4(ambientLight + (1.0 - shadow) * (diffuseLight), 1.0);
 				//color = vec4(v_Texcoord, 0.0, 1.0);
 			}
 		)";
@@ -92,8 +155,10 @@ public:
 		//Creates ambien light
 		Taller::Entity light = coord.CreateEntity();
 		coord.AddComponent<Taller::AmbientLightComponent>(light, glm::vec3(1.0f), 0.8f);
-		coord.AddComponent<Taller::DirectionalLightComponent>(light, glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(1.0f), 0.3f);
+		coord.AddComponent<Taller::DirectionalLightComponent>(light, glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f), 0.3f);
 		coord.GroupEntity(light, "generalLight");
+
+
 
 		/* CREATES A AXOLOTL ENTITY */
 		Taller::Entity triangle = coord.CreateEntity();
@@ -108,18 +173,6 @@ public:
 		//----------------------------------//
 
 
-		/* CREATES A GROUND PLANE ENTITY */
-		Taller::Entity plane = coord.CreateEntity();
-		coord.AddComponent<Taller::TransformComponent>(plane, glm::vec3(0.0f, -0.5f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(15.0f));
-		coord.AddComponent<Taller::StaticMeshComponent>(plane, "SquareShader", "", "square");
-		Taller::StaticMeshComponent& plane_SM = coord.GetComponent<Taller::StaticMeshComponent>(plane);
-		coord.GroupEntity(plane, "Static");
-
-		m_MeshLibrary.Load(plane_SM.meshName, "assets/3dmodels/Square.tmesh");
-		m_ShaderLibrary.Load(plane_SM.shaderName, "assets/shaders/squareColor.glsl");
-		//----------------------------------//
-
-
 		/* CREATES A CUBE ENTITY */
 		Taller::Entity cube = coord.CreateEntity();
 		coord.AddComponent<Taller::TransformComponent>(cube, glm::vec3(-2.0f, 0.0f, 0.0f), glm::vec3(-55.0f, 10.0f, 45.0f), glm::vec3(0.25f));
@@ -130,6 +183,19 @@ public:
 		m_MeshLibrary.Load(cube_SM.meshName, "assets/3dmodels/Cube.tmesh");
 		m_ShaderLibrary.Load(cube_SM.shaderName, "assets/shaders/cube.glsl");
 		//----------------------------------//
+
+		/* CREATES A GROUND PLANE ENTITY */
+		Taller::Entity plane = coord.CreateEntity();
+		coord.AddComponent<Taller::TransformComponent>(plane, glm::vec3(0.0f, -0.5f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(15.0f));
+		coord.AddComponent<Taller::StaticMeshComponent>(plane, "CubeShader", "", "square");
+		Taller::StaticMeshComponent& plane_SM = coord.GetComponent<Taller::StaticMeshComponent>(plane);
+		coord.GroupEntity(plane, "Static");
+
+		m_MeshLibrary.Load(plane_SM.meshName, "assets/3dmodels/Square.tmesh");
+		//----------------------------------//
+
+
+
 
 
 
@@ -152,21 +218,66 @@ public:
 		coord.AddQueryRequirement<Taller::StaticMeshComponent>();
 		renderSignature = coord.RegisterQueryRequirement();
 
+		Taller::FrameBufferSpecification frameBufferSpecification;
+		frameBufferSpecification.Height = 4096;
+		frameBufferSpecification.Width = 4096;
+		frameBufferSpecification.Attachments = { Taller::FrameBufferTextureFormat::DEPTH_COMPONENT };
+		m_ShadowMap = Taller::FrameBuffer::Create(frameBufferSpecification);
 
+		m_ShaderLibrary.Load("simpleDepth", "assets/shaders/simpleDepth.glsl");
 	};
 
 	void OnUpdate(Taller::Timestep timestep) override {
 
 		TL_PROFILE_FUNCTION();
 
-
-		{
-			TL_PROFILE_SCOPE("Render preparation");
-			Taller::RenderCommand::SetClearColor({ 0.7f, 0.0f, 0.7f, 1.0f });
-			Taller::RenderCommand::Clear();
-		}
+		/*SHADOW PASS*/
 		
-		for (auto entities : coord.GetEntitiesByGroup("cam")) {
+		{
+			TL_PROFILE_SCOPE("Shadow pass");
+			
+			Taller::RenderCommand::Clear();
+			Taller::RenderCommand::SetViewport(0, 0, m_ShadowMap->GetSpecification().Width, m_ShadowMap->GetSpecification().Height);
+
+			float near_plane = 0.1f;
+			float far_plane = 10.0f;
+			glm::mat4 lightProjection = glm::ortho(-5.0f, 5.0f, -5.0f, 5.0f, near_plane, far_plane);
+			glm::mat4 lightView = glm::lookAt(glm::vec3(-2.0f, 4.0f, -1.0f),
+				glm::vec3(0.0f, 0.0f, 0.0f),
+				glm::vec3(1.0f, 1.0f, 1.0f));
+
+			m_ShadowMap->Bind();
+
+			for (auto entities : coord.QueryEntitiesBySignature(renderSignature)) {
+				Taller::TransformComponent& transform = coord.GetComponent<Taller::TransformComponent>(entities.GetId());
+				Taller::StaticMeshComponent& staticMesh = coord.GetComponent<Taller::StaticMeshComponent>(entities.GetId());
+
+				{
+					Taller::Renderer::BeginSceneData beginSceneData_ShadowMapping;
+					beginSceneData_ShadowMapping.LightProjectionView = lightProjection * lightView;
+					Taller::Renderer::BeginScene(beginSceneData_ShadowMapping);
+
+					auto shader = m_ShaderLibrary.Get("simpleDepth");
+					auto mesh = m_MeshLibrary.Get(staticMesh.meshName);
+
+
+					Taller::Renderer::Submit(shader, mesh, transform.location, transform.rotation, transform.scale);
+
+
+					Taller::Renderer::EndScene();
+				}
+			}
+
+			m_ShadowMap->Unbind();
+		}
+
+
+
+		/*RENDER PASS*/
+		{
+			TL_PROFILE_SCOPE("Render pass");
+			
+			for (auto entities : coord.GetEntitiesByGroup("cam")) {
 				transformCam.location.x = camx;
 				transformCam.location.y = camy;
 				transformCam.location.z = camz;
@@ -183,50 +294,75 @@ public:
 
 				//TODO Implement this in the renderer in each frame because the camera will be always transforming
 				cam.viewProjection = Taller::ComponentOperations::CalculateCameraViewProjection(cam, transformCam);
-		}
-
-
-		Taller::AmbientLightComponent ambientLightComp;// It makes a copy of it
-		Taller::DirectionalLightComponent directionalLightComp;// It makes a copy of it
-		for (auto ambientLight : coord.GetEntitiesByGroup("generalLight")) {
-			Taller::AmbientLightComponent& alComp = coord.GetComponent<Taller::AmbientLightComponent>(ambientLight);
-			Taller::DirectionalLightComponent& dlComp = coord.GetComponent<Taller::DirectionalLightComponent>(ambientLight);
-			ambientLightComp = Taller::AmbientLightComponent(alComp.color, alComp.intensity);
-			directionalLightComp = Taller::DirectionalLightComponent(dlComp.direction, dlComp.color, dlComp.intensity);
-			break;
-		}
-
-		for (auto entities : coord.QueryEntitiesBySignature(renderSignature)) {
-			Taller::TransformComponent& transform = coord.GetComponent<Taller::TransformComponent>(entities.GetId());
-			Taller::StaticMeshComponent& staticMesh = coord.GetComponent<Taller::StaticMeshComponent>(entities.GetId());
-
-			if (coord.EntityBelongsToGroup(entities, "Movable")) {
-				transform.rotation.x = glm::degrees(x);
-				transform.rotation.y = glm::degrees(y);
-				transform.rotation.z = glm::degrees(z);
 			}
 
 			{
-				TL_PROFILE_SCOPE("Render");
+				TL_PROFILE_SCOPE("Render preparation");
 
-				Taller::Renderer::BeginScene(cam.viewProjection, ambientLightComp.color, ambientLightComp.intensity, directionalLightComp.direction, directionalLightComp.color, directionalLightComp.intensity);
-
-					auto shader = m_ShaderLibrary.Get(staticMesh.shaderName);
-
-					auto texture = staticMesh.textureName != "" ? m_Texture2DLibrary.Get(staticMesh.textureName) : nullptr;
-					auto mesh = m_MeshLibrary.Get(staticMesh.meshName);
-
-
-					if (texture) {
-						Taller::Renderer::Submit(shader, texture, mesh, transform.location, transform.rotation, transform.scale);
-					}
-					else {
-						Taller::Renderer::Submit(shader, mesh, transform.location, transform.rotation, transform.scale);
-
-					}
-
-				Taller::Renderer::EndScene();
+				Taller::RenderCommand::SetViewport(0, 0, Taller::Application::Get().GetWindow().GetWidth(), Taller::Application::Get().GetWindow().GetHeight());
+				Taller::RenderCommand::SetClearColor({ 0.7f, 0.0f, 0.7f, 1.0f });
+				Taller::RenderCommand::Clear();
 			}
+
+
+			Taller::AmbientLightComponent ambientLightComp;// It makes a copy of it
+			Taller::DirectionalLightComponent directionalLightComp;// It makes a copy of it
+			for (auto ambientLight : coord.GetEntitiesByGroup("generalLight")) {
+				Taller::AmbientLightComponent& alComp = coord.GetComponent<Taller::AmbientLightComponent>(ambientLight);
+				Taller::DirectionalLightComponent& dlComp = coord.GetComponent<Taller::DirectionalLightComponent>(ambientLight);
+				ambientLightComp = Taller::AmbientLightComponent(alComp.color, alComp.intensity);
+				directionalLightComp = Taller::DirectionalLightComponent(dlComp.direction, dlComp.color, dlComp.intensity);
+				break;
+			}
+
+			for (auto entities : coord.QueryEntitiesBySignature(renderSignature)) {
+				Taller::TransformComponent& transform = coord.GetComponent<Taller::TransformComponent>(entities.GetId());
+				Taller::StaticMeshComponent& staticMesh = coord.GetComponent<Taller::StaticMeshComponent>(entities.GetId());
+
+				if (coord.EntityBelongsToGroup(entities, "Movable")) {
+					transform.rotation.x = glm::degrees(x);
+					transform.rotation.y = glm::degrees(y);
+					transform.rotation.z = glm::degrees(z);
+				}
+
+				{
+					TL_PROFILE_SCOPE("Render scene");
+
+					Taller::Renderer::BeginSceneData beginSceneData_Render;
+					beginSceneData_Render.Camera = cam.viewProjection;
+					beginSceneData_Render.AmbientColor = ambientLightComp.color;
+					beginSceneData_Render.AmbientIntensity = ambientLightComp.intensity;
+					beginSceneData_Render.DiffuseDirection = directionalLightComp.direction;
+					beginSceneData_Render.DiffuseColor = directionalLightComp.color;
+					beginSceneData_Render.DiffuseIntensity = directionalLightComp.intensity;
+					float near_plane = 0.1f;
+					float far_plane = 10.0f;
+					beginSceneData_Render.ShadowMapping = m_ShadowMap->GetDepthAttachmentRendererID();
+					glm::mat4 lightProjection = glm::ortho(-5.0f, 5.0f, -5.0f, 5.0f, near_plane, far_plane);
+					glm::mat4 lightView = glm::lookAt(glm::vec3(-2.0f, 4.0f, -1.0f),
+						glm::vec3(0.0f, 0.0f, 0.0f),
+						glm::vec3(1.0f, 1.0f, 1.0f));
+					beginSceneData_Render.LightProjectionView = lightProjection * lightView;
+					Taller::Renderer::BeginScene(beginSceneData_Render);
+
+						auto shader = m_ShaderLibrary.Get(staticMesh.shaderName);
+
+						auto texture = staticMesh.textureName != "" ? m_Texture2DLibrary.Get(staticMesh.textureName) : nullptr;
+						auto mesh = m_MeshLibrary.Get(staticMesh.meshName);
+
+
+						if (texture) {
+							Taller::Renderer::Submit(shader, texture, mesh, transform.location, transform.rotation, transform.scale);
+						}
+						else {
+							Taller::Renderer::Submit(shader, mesh, transform.location, transform.rotation, transform.scale);
+
+						}
+
+					Taller::Renderer::EndScene();
+				}
+			}
+			
 		}
 	}
 
@@ -245,6 +381,7 @@ public:
 
 		ImGui::End();
 
+
 		ImGui::Begin("Camera controls!");
 
 		ImGui::SliderFloat("X", &camx, -100.0f, 100.0f, "X = %f");
@@ -257,7 +394,12 @@ public:
 
 		ImGui::End();
 		
-		
+
+		ImGui::Begin("Depth buffer");
+
+		ImGui::Image((void*)m_ShadowMap->GetDepthAttachmentRendererID(), ImVec2{ 248,248 });
+
+		ImGui::End();
 	}
 
 
@@ -272,6 +414,8 @@ private:
 	Taller::Coordinator& coord = Taller::Application::Get().GetCoordinator();
 
 	Taller::Signature renderSignature;
+
+	Taller::AssetRef<Taller::FrameBuffer> m_ShadowMap;
 
 	float x;
 	float y;

@@ -2,6 +2,7 @@
 #include "Renderer.h"
 
 #include "Platform/OpenGL/OpenGLShader.h"
+#include <glad/glad.h>
 
 namespace Taller {
 
@@ -18,15 +19,21 @@ namespace Taller {
 		RenderCommand::SetViewport(0, 0, width, height);
 	}
 
-	void Renderer::BeginScene(glm::mat4& camera, glm::vec3 ambientColor, float ambientIntensity, glm::vec3 diffuseDirection, glm::vec3 diffuseColor, float diffuseIntensity) {
-		m_SceneData->ViewProjectionMatrix = camera;
+	void Renderer::BeginScene(BeginSceneData& beginSceneData) {
+		m_SceneData->ViewProjectionMatrix = beginSceneData.Camera;
 
-		m_SceneData->AmbientColor = ambientColor;
-		m_SceneData->AmbientIntensity = ambientIntensity;
+		m_SceneData->AmbientColor = beginSceneData.AmbientColor;
+		m_SceneData->AmbientIntensity = beginSceneData.AmbientIntensity;
 
-		m_SceneData->DiffuseColor = diffuseColor;
-		m_SceneData->DiffuseDirection = diffuseDirection;
-		m_SceneData->DiffuseIntensity = diffuseIntensity;
+		m_SceneData->DiffuseColor = beginSceneData.DiffuseColor;
+		m_SceneData->DiffuseDirection = beginSceneData.DiffuseDirection;
+		m_SceneData->DiffuseIntensity = beginSceneData.DiffuseIntensity;
+		
+		m_SceneData->LightSpaceMatrix = beginSceneData.LightProjectionView;
+		m_SceneData->ShadowMapping = beginSceneData.ShadowMapping;
+		
+
+		RenderCommand::BindTextureUnit(0, m_SceneData->ShadowMapping);
 	}
 
 	void Renderer::EndScene() {
@@ -34,7 +41,7 @@ namespace Taller {
 	}
 
 	void Renderer::Submit(const AssetRef<Shader>& shader, const AssetRef<VertexArray>& vertexArray, const glm::vec3& location, const glm::vec3& rotation, const glm::vec3& scale) {
-		
+
 		shader->Bind();
 
 		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformFloat3("u_AmbientLightColor", m_SceneData->AmbientColor);
@@ -45,7 +52,12 @@ namespace Taller {
 		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformFloat("u_DiffuseLightIntensity", m_SceneData->DiffuseIntensity);
 
 		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_ProjectionViewMatrix", m_SceneData->ViewProjectionMatrix);
+		
+		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_LightSpaceMatrix", m_SceneData->LightSpaceMatrix);
 
+		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformInt("u_ShadowMap", 0);
+
+		RenderCommand::BindTextureUnit(3, m_SceneData->ShadowMapping);
 		/* TODO This is not efficient and introduce the Gimbal locks, change it to quaternions*/
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), location)
 			* glm::rotate(glm::mat4(1.0), glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f))
@@ -61,8 +73,8 @@ namespace Taller {
 
 	void Renderer::Submit(const AssetRef<Shader>& shader, const AssetRef<Texture>& texture, const AssetRef<VertexArray>& vertexArray, const glm::vec3& location, const glm::vec3& rotation, const glm::vec3& scale) {
 
-		texture->Bind();
-
+		texture->Bind(1);
+		
 		std::dynamic_pointer_cast<OpenGLShader>(shader)->Bind();
 
 		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformFloat3("u_AmbientLightColor", m_SceneData->AmbientColor);
@@ -72,8 +84,13 @@ namespace Taller {
 		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformFloat3("u_DiffuseLightColor", m_SceneData->DiffuseColor);
 		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformFloat("u_DiffuseLightIntensity", m_SceneData->DiffuseIntensity);
 
-		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformInt("u_Texture", 0);
 		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_ProjectionViewMatrix", m_SceneData->ViewProjectionMatrix);
+
+		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_LightSpaceMatrix", m_SceneData->LightSpaceMatrix);
+		
+		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformInt("u_ShadowMap", 0);
+		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformInt("u_Texture", 1);
+		
 
 		/* TODO This is not efficient and introduce the Gimbal locks, change it to quaternions*/
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), location)
