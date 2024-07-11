@@ -22,6 +22,7 @@
 #include "Taller/Renderer/Renderer.h"
 
 #include "Taller/Renderer/Buffer.h"
+#include "Taller/Renderer/FrameBuffer.h"
 #include "Taller/Renderer/Shader.h"
 #include "Taller/Renderer/VertexArray.h"
 

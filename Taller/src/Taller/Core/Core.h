@@ -31,6 +31,17 @@ namespace Taller {
 	template<typename T>
 	using AssetScope = std::unique_ptr<T>;
 
+	template<typename T, typename ... Args>
+	constexpr AssetScope<T> CreateAssetScope(Args&& ... args) {
+		return std::make_unique<T>(std::forward<Args>(args)...);
+	}
+
+
 	template<typename T>
 	using AssetRef = std::shared_ptr<T>;
+
+	template<typename T, typename ... Args>
+	constexpr AssetRef<T> CreateAssetRef(Args&& ... args) {
+		return std::make_shared<T>(std::forward<Args>(args)...);
+	}
 }
