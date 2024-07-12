@@ -59,7 +59,7 @@ std::string triangleVertexSrc = R"(
 std::string triangleFragmentSrc = R"(
 			#version 330 core
 
-			layout(location = 0) out vec4 color;
+			layout(location = 0) out vec4 finalColor;
 		
 			in vec3 v_Position;
 			in vec3 v_Normal;
@@ -78,6 +78,8 @@ std::string triangleFragmentSrc = R"(
 			uniform vec3 u_DiffuseLightDirection;
 			uniform vec3 u_DiffuseLightColor;
 			uniform float u_DiffuseLightIntensity;
+			
+			uniform float u_Gamma;
 
 
 			float ShadowCalculation(vec4 fragPosLightSpace){
@@ -142,7 +144,8 @@ std::string triangleFragmentSrc = R"(
 				//Shadows
 				float shadow = ShadowCalculation(v_FragPosLightSpace);
 
-				color = c * vec4(ambientLight + (1.0 - shadow) * (diffuseLight), 1.0);
+				vec4 fragmentColor = c * vec4(ambientLight + (1.0 - shadow) * (diffuseLight), 1.0);
+				finalColor = vec4(pow(fragmentColor.rgb, vec3(1/u_Gamma)), 1.0);
 				//color = vec4(v_Texcoord, 0.0, 1.0);
 			}
 		)";

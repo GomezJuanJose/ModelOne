@@ -21,6 +21,8 @@ namespace Taller {
 
 			glm::mat4 LightSpaceMatrix; // For shadow mapping
 			uint32_t ShadowMapping;
+
+			float Gamma = 1.0f;
 		};
 
 	public:
@@ -36,6 +38,8 @@ namespace Taller {
 			float DiffuseIntensity;
 
 			uint32_t ShadowMapping;
+
+			float Gamma = 1.0f;
 		};
 
 	public:

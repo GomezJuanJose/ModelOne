@@ -32,6 +32,8 @@ namespace Taller {
 		m_SceneData->LightSpaceMatrix = beginSceneData.LightProjectionView;
 		m_SceneData->ShadowMapping = beginSceneData.ShadowMapping;
 		
+		m_SceneData->Gamma = beginSceneData.Gamma;
+		
 
 		RenderCommand::BindTextureUnit(0, m_SceneData->ShadowMapping);
 	}
@@ -56,6 +58,8 @@ namespace Taller {
 		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_LightSpaceMatrix", m_SceneData->LightSpaceMatrix);
 
 		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformInt("u_ShadowMap", 0);
+		
+		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformFloat("u_Gamma", m_SceneData->Gamma);
 
 		RenderCommand::BindTextureUnit(3, m_SceneData->ShadowMapping);
 		/* TODO This is not efficient and introduce the Gimbal locks, change it to quaternions*/
@@ -91,6 +95,8 @@ namespace Taller {
 		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformInt("u_ShadowMap", 0);
 		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformInt("u_Texture", 1);
 		
+		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformFloat("u_Gamma", m_SceneData->Gamma);
+
 
 		/* TODO This is not efficient and introduce the Gimbal locks, change it to quaternions*/
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), location)
