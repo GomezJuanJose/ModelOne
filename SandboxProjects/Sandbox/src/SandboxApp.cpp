@@ -151,9 +151,9 @@ std::string triangleFragmentSrc = R"(
 		)";
 #pragma endregion
 
-class ExampleLayer : public Taller::Layer {
+class RenderLayer : public Taller::Layer {
 public:
-	ExampleLayer() : Layer("Example") {
+	RenderLayer() : Layer("Render") {
 
 		//Creates ambien light
 		Taller::Entity light = coord.CreateEntity();
@@ -164,11 +164,12 @@ public:
 
 
 		/* CREATES A AXOLOTL ENTITY */
-		Taller::Entity triangle = coord.CreateEntity();
-		coord.AddComponent<Taller::TransformComponent>(triangle, glm::vec3(0.0f), glm::vec3(-45.0f), glm::vec3(0.25f));
-		coord.AddComponent<Taller::StaticMeshComponent>(triangle, "TriangleShader", "axolotl", "cyan_texture");
-		Taller::StaticMeshComponent& axolotl_SM = coord.GetComponent<Taller::StaticMeshComponent>(triangle);
-		coord.GroupEntity(triangle,"Movable");
+		Taller::Entity axolotl = coord.CreateEntity();
+		coord.AddComponent<Taller::TransformComponent>(axolotl, glm::vec3(0.0f), glm::vec3(-45.0f), glm::vec3(0.25f));
+		coord.AddComponent<Taller::StaticMeshComponent>(axolotl, "TriangleShader", "axolotl", "cyan_texture");
+		coord.AddComponent<Taller::PointMassComponent>(axolotl);
+		Taller::StaticMeshComponent& axolotl_SM = coord.GetComponent<Taller::StaticMeshComponent>(axolotl);
+		coord.GroupEntity(axolotl,"Movable");
 
 		m_Texture2DLibrary.Load(axolotl_SM.textureName, "assets/textures/axolotl_cyan.png");
 		m_MeshLibrary.Load(axolotl_SM.meshName, "assets/3dmodels/axolotl.tmesh");
@@ -181,7 +182,7 @@ public:
 		coord.AddComponent<Taller::TransformComponent>(cube, glm::vec3(-2.0f, 0.0f, 0.0f), glm::vec3(-55.0f, 10.0f, 45.0f), glm::vec3(0.25f));
 		coord.AddComponent<Taller::StaticMeshComponent>(cube, "CubeShader", "", "Cube");
 		Taller::StaticMeshComponent& cube_SM = coord.GetComponent<Taller::StaticMeshComponent>(cube);
-		coord.GroupEntity(cube, "Movable");
+		
 
 		m_MeshLibrary.Load(cube_SM.meshName, "assets/3dmodels/Cube.tmesh");
 		m_ShaderLibrary.Load(cube_SM.shaderName, "assets/shaders/cube.glsl");
@@ -322,12 +323,6 @@ public:
 				Taller::TransformComponent& transform = coord.GetComponent<Taller::TransformComponent>(entities.GetId());
 				Taller::StaticMeshComponent& staticMesh = coord.GetComponent<Taller::StaticMeshComponent>(entities.GetId());
 
-				if (coord.EntityBelongsToGroup(entities, "Movable")) {
-					transform.rotation.x = glm::degrees(x);
-					transform.rotation.y = glm::degrees(y);
-					transform.rotation.z = glm::degrees(z);
-				}
-
 				{
 					TL_PROFILE_SCOPE("Render scene");
 
@@ -375,16 +370,7 @@ public:
 
 	virtual void OnImGuiRender() override {
 		TL_PROFILE_FUNCTION();
-		ImGui::Begin("Debug 3D Model!");
-
-		ImGui::SliderAngle("X", &x);
-		ImGui::SliderAngle("Y", &y);
-		ImGui::SliderAngle("Z", &z);
-		ImGui::Separator();
-
-		ImGui::End();
-
-
+		
 		ImGui::Begin("Camera controls!");
 
 		ImGui::SliderFloat("X", &camx, -100.0f, 100.0f, "X = %f");
@@ -432,10 +418,70 @@ private:
 	float camRotz = 0;
 };
 
+
+class PhysicsLayer : public Taller::Layer {
+public:
+	PhysicsLayer() : Layer("PhysicsLayer") {
+
+		coord.AddQueryRequirement<Taller::TransformComponent>();
+		coord.AddQueryRequirement<Taller::PointMassComponent>();
+		physicsSignature = coord.RegisterQueryRequirement();
+
+
+		forcesRegistry[Taller::ForceGenerator::Gravity] = &Taller::ComponentOperations::ApplyGravityForce;
+		forcesRegistry[Taller::ForceGenerator::Drag] = &Taller::ComponentOperations::ApplyDragForce;
+
+	};
+
+	void OnUpdate(Taller::Timestep timestep) override {
+
+		TL_PROFILE_FUNCTION();
+
+		for (Taller::Entity entity : coord.QueryEntitiesBySignature(physicsSignature)) {
+			Taller::TransformComponent& transform = coord.GetComponent<Taller::TransformComponent>(entity.GetId());
+			Taller::PointMassComponent& pointMass = coord.GetComponent<Taller::PointMassComponent>(entity.GetId());
+
+			//Apply all forces before the integration
+			for (Taller::ForceGenerator influentialForce : pointMass.influentialForces) {
+				forcesRegistry[influentialForce](pointMass, timestep);
+			}
+			
+
+			Taller::ComponentOperations::Integrate(transform, pointMass, timestep);
+		}
+
+	}
+
+	void OnEvent(Taller::Event& e) override {
+		TL_LOG_INFO(true, "Layer event : %s", e.ToString());
+	}
+
+	virtual void OnImGuiRender() override {
+		TL_PROFILE_FUNCTION();
+
+		ImGui::Begin("Physics!");
+
+		ImGui::End();
+
+	}
+
+
+private:
+	Taller::Coordinator& coord = Taller::Application::Get().GetCoordinator();
+
+	Taller::Signature physicsSignature;
+
+
+	using forceFunction = std::function<void(Taller::PointMassComponent&, float)>;
+	std::unordered_map<Taller::ForceGenerator, forceFunction> forcesRegistry;
+};
+
+
 class Sandbox : public Taller::Application {
 public:
 	Sandbox() {
-		PushLayer(new ExampleLayer());
+		PushLayer(new PhysicsLayer());
+		PushLayer(new RenderLayer());
 	}
 	~Sandbox() {}
 

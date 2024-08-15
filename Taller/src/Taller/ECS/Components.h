@@ -48,4 +48,28 @@ namespace Taller {
 		DirectionalLightComponent(glm::vec3 direction = glm::vec3(0.0f), glm::vec3 color = glm::vec3(1.0f), float intensity = 1.0f) : direction(direction), color(color), intensity(intensity) {
 		}
 	};
+
+
+
+
+
+
+	enum class ForceGenerator {
+		Gravity,
+		Drag
+	};
+
+	struct PointMassComponent {
+		glm::vec3 velocity;
+		glm::vec3 acceleration;
+		glm::vec3 forceAccumulation;
+
+		float damping;
+		float inverseMass;
+
+		std::vector<ForceGenerator> influentialForces;
+
+		PointMassComponent(glm::vec3 velocity = {0.0f, 0.0f, 0.0f}, glm::vec3 acceleration = {0, 0, 0}, float damping = 0.9f, float inverseMass = ((float)1.0f)/20.0f) : velocity(velocity), acceleration(acceleration), damping(damping), inverseMass(inverseMass), forceAccumulation({0}), influentialForces({ForceGenerator::Gravity, ForceGenerator::Drag}) {
+		}
+	};
 }
