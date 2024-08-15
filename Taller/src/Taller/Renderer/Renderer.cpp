@@ -61,7 +61,7 @@ namespace Taller {
 		
 		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformFloat("u_Gamma", m_SceneData->Gamma);
 
-		RenderCommand::BindTextureUnit(3, m_SceneData->ShadowMapping);
+		
 		/* TODO This is not efficient and introduce the Gimbal locks, change it to quaternions*/
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), location)
 			* glm::rotate(glm::mat4(1.0), glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f))
