@@ -69,7 +69,17 @@ namespace Taller {
 
 		std::vector<ForceGenerator> influentialForces;
 
-		PointMassComponent(glm::vec3 velocity = {0.0f, 0.0f, 0.0f}, glm::vec3 acceleration = {0, 0, 0}, float damping = 0.9f, float inverseMass = ((float)1.0f)/20.0f) : velocity(velocity), acceleration(acceleration), damping(damping), inverseMass(inverseMass), forceAccumulation({0}), influentialForces({ForceGenerator::Gravity, ForceGenerator::Drag}) {
+		PointMassComponent(glm::vec3 velocity = glm::vec3(0.0f), glm::vec3 acceleration = glm::vec3(0.0f), float damping = 0.9f, float inverseMass = 0.0f) : velocity(velocity), acceleration(acceleration), damping(damping), inverseMass(inverseMass), forceAccumulation({0}), influentialForces({ForceGenerator::Gravity, ForceGenerator::Drag}) {
 		}
+	};
+
+	struct BoxCollisionComponent {
+		glm::vec3 size;
+		glm::vec3 minPoint;
+		glm::vec3 maxPoint;
+
+		std::function<void(int, int)> onCollisionFunction;
+
+		BoxCollisionComponent(glm::vec3 size = { 0.05f, 0.05f, 0.05f }, std::function<void(int, int)> onCollisionFunction = [&](int a, int b){}) : size(size), onCollisionFunction(onCollisionFunction) {}
 	};
 }

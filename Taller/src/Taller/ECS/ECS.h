@@ -162,8 +162,12 @@ namespace Taller {
 			}
 		}
 
+		bool HasEntityToIndex(int entityId) {
+			return m_EntityToIndex.count(entityId) == 0;
+		}
+
 		T& Get(int entityId) {
-			int index = m_EntityToIndex[entityId];
+			int index = m_EntityToIndex.at(entityId);
 			return static_cast<T&>(m_Data[index]);
 		}
 

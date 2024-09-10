@@ -19,6 +19,9 @@
 
 //TODO Hacer que solo haga una vez el calculo de la direccion de la luz
 
+//TODO Si arrastras la ventana el sistema de colisiones para de funcionar (porque se para el sistema de capas) y eso hace que atraviese el suelo si se pilla en el momento justo que hace la colision
+//TODO Hacer que el ECS devuelva una estructura por defecto si no encuentra el componente que busca en la entidad
+
 #pragma region PLACE_HOLDER_DATA
 std::string triangleVertexSrc = R"(
 
@@ -167,7 +170,8 @@ public:
 		Taller::Entity axolotl = coord.CreateEntity();
 		coord.AddComponent<Taller::TransformComponent>(axolotl, glm::vec3(0.0f), glm::vec3(-45.0f), glm::vec3(0.25f));
 		coord.AddComponent<Taller::StaticMeshComponent>(axolotl, "TriangleShader", "axolotl", "cyan_texture");
-		coord.AddComponent<Taller::PointMassComponent>(axolotl);
+		coord.AddComponent<Taller::PointMassComponent>(axolotl, glm::vec3(0.0f), glm::vec3(0.0f), 0.9f, ((float)1.0f) / 20.0f);
+		coord.AddComponent<Taller::BoxCollisionComponent>(axolotl, glm::vec3( 0.05f, 0.05f, 0.05f ), [&](int a, int b) {TL_LOG_INFO(true, "Axolotl has collision!!"); });
 		Taller::StaticMeshComponent& axolotl_SM = coord.GetComponent<Taller::StaticMeshComponent>(axolotl);
 		coord.GroupEntity(axolotl,"Movable");
 
@@ -175,6 +179,8 @@ public:
 		m_MeshLibrary.Load(axolotl_SM.meshName, "assets/3dmodels/axolotl.tmesh");
 		m_ShaderLibrary.Load(axolotl_SM.shaderName, triangleVertexSrc, triangleFragmentSrc);
 		//----------------------------------//
+
+		
 
 
 		/* CREATES A CUBE ENTITY */
@@ -190,8 +196,9 @@ public:
 
 		/* CREATES A GROUND PLANE ENTITY */
 		Taller::Entity plane = coord.CreateEntity();
-		coord.AddComponent<Taller::TransformComponent>(plane, glm::vec3(0.0f, -0.5f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(15.0f));
+		coord.AddComponent<Taller::TransformComponent>(plane, glm::vec3(0.0f, -3.0f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(15.0f));
 		coord.AddComponent<Taller::StaticMeshComponent>(plane, "CubeShader", "", "square");
+		coord.AddComponent<Taller::BoxCollisionComponent>(plane, glm::vec3({ 1.0f, 0.05f, 1.0f }));
 		Taller::StaticMeshComponent& plane_SM = coord.GetComponent<Taller::StaticMeshComponent>(plane);
 		coord.GroupEntity(plane, "Static");
 
@@ -199,7 +206,15 @@ public:
 		//----------------------------------//
 
 
-
+		/* CREATES A AXOLOTL ENTITY */
+		Taller::Entity axolotlSecond = coord.CreateEntity();
+		coord.AddComponent<Taller::TransformComponent>(axolotlSecond, glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(-45.0f), glm::vec3(0.25f));
+		coord.AddComponent<Taller::StaticMeshComponent>(axolotlSecond, "TriangleShader", "axolotl", "cyan_texture");
+		coord.AddComponent<Taller::PointMassComponent>(axolotlSecond, glm::vec3(0.0f), glm::vec3(0.0f), 0.9f, ((float)1.0f) / 10.0f);
+		coord.AddComponent<Taller::BoxCollisionComponent>(axolotlSecond, glm::vec3(0.05f, 0.05f, 0.05f), [&](int a, int b) {TL_LOG_INFO(true, "Axolotl second has collision!!"); });
+		Taller::StaticMeshComponent& axolotlSecond_SM = coord.GetComponent<Taller::StaticMeshComponent>(axolotlSecond);
+		coord.GroupEntity(axolotlSecond, "Movable");
+		//----------------------------------//
 
 
 
@@ -212,7 +227,7 @@ public:
 		cam = coord.GetComponent<Taller::CameraComponent>(camera);
 		transformCam = coord.GetComponent<Taller::TransformComponent>(camera);
 		transformCam.location = glm::vec3(0.0f, 0.0f, 5.0f);
-		transformCam.rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+		transformCam.rotation = glm::vec3(25.0f, 0.0f, 0.0f);
 
 		cam.viewProjection = Taller::ComponentOperations::CalculateCameraViewProjection(cam, transformCam);
 		//----------------------------------//
@@ -413,7 +428,7 @@ private:
 	float camx = 0;
 	float camy = 1.0;
 	float camz = 5.0;
-	float camRotx = 0;
+	float camRotx = -0.6f;
 	float camRoty = 0;
 	float camRotz = 0;
 };
@@ -427,6 +442,10 @@ public:
 		coord.AddQueryRequirement<Taller::PointMassComponent>();
 		physicsSignature = coord.RegisterQueryRequirement();
 
+		coord.AddQueryRequirement<Taller::TransformComponent>();
+		coord.AddQueryRequirement<Taller::BoxCollisionComponent>();
+		collisionSignature = coord.RegisterQueryRequirement();
+
 
 		forcesRegistry[Taller::ForceGenerator::Gravity] = &Taller::ComponentOperations::ApplyGravityForce;
 		forcesRegistry[Taller::ForceGenerator::Drag] = &Taller::ComponentOperations::ApplyDragForce;
@@ -437,20 +456,93 @@ public:
 
 		TL_PROFILE_FUNCTION();
 
-		for (Taller::Entity entity : coord.QueryEntitiesBySignature(physicsSignature)) {
-			Taller::TransformComponent& transform = coord.GetComponent<Taller::TransformComponent>(entity.GetId());
-			Taller::PointMassComponent& pointMass = coord.GetComponent<Taller::PointMassComponent>(entity.GetId());
+		//Applies forces
+		{
+			TL_PROFILE_SCOPE("Apply forces");
 
-			//Apply all forces before the integration
-			for (Taller::ForceGenerator influentialForce : pointMass.influentialForces) {
-				forcesRegistry[influentialForce](pointMass, timestep);
+			for (Taller::Entity entity : coord.QueryEntitiesBySignature(physicsSignature)) {
+				
+				Taller::PointMassComponent& pointMass = coord.GetComponent<Taller::PointMassComponent>(entity.GetId());
+
+				//Apply all forces before the integration
+				for (Taller::ForceGenerator influentialForce : pointMass.influentialForces) {
+					forcesRegistry[influentialForce](pointMass, timestep);
+				}
+
 			}
-			
-
-			Taller::ComponentOperations::Integrate(transform, pointMass, timestep);
 		}
 
-	}
+
+		//Collision detection
+		{
+			TL_PROFILE_SCOPE("Collision detection and resolution");
+
+			std::set<Taller::Entity> entities = coord.QueryEntitiesBySignature(collisionSignature);
+			for (auto i = entities.begin(); i != entities.end(); i++) {
+				Taller::Entity entity = *i;
+				Taller::TransformComponent& transform = coord.GetComponent<Taller::TransformComponent>(entity.GetId());
+				Taller::BoxCollisionComponent& boxCollision = coord.GetComponent<Taller::BoxCollisionComponent>(entity.GetId());
+
+				boxCollision.maxPoint = transform.location + boxCollision.size;
+				boxCollision.minPoint = transform.location - boxCollision.size;
+
+				debugMaxCollisionPoint = boxCollision.maxPoint;
+				debugMinCollisionPoint = boxCollision.minPoint;
+
+
+				for (auto j = i; j != entities.end(); j++) {
+					Taller::Entity auxiliarEntity = *j;
+
+					if (auxiliarEntity.GetId() == entity.GetId()) {
+						continue;
+					}
+
+					Taller::TransformComponent& transformAuxiliar = coord.GetComponent<Taller::TransformComponent>(auxiliarEntity.GetId());
+					Taller::BoxCollisionComponent& boxCollisionAuxiliar = coord.GetComponent<Taller::BoxCollisionComponent>(auxiliarEntity.GetId());
+
+					if (Taller::ComponentOperations::TestAABBToAABB(boxCollision, boxCollisionAuxiliar)) {
+						TL_LOG_INFO(true, "Collision success : %s with %s", std::to_string(entity.GetId()), std::to_string(auxiliarEntity.GetId()));
+
+						boxCollision.onCollisionFunction(entity.GetId(), auxiliarEntity.GetId());
+						boxCollisionAuxiliar.onCollisionFunction(entity.GetId(), auxiliarEntity.GetId());
+
+						//Collision resolution					
+						bool hasAMass = coord.HasComponent<Taller::PointMassComponent>(entity.GetId());
+						bool hasBMass = coord.HasComponent<Taller::PointMassComponent>(auxiliarEntity.GetId());
+						//Apply a general resolution by force for resting bodies, moving bodies and interpenetration. In the future use a specific formula to resolve each case, collision, interprenetation and resting contact
+						
+
+						if (!hasAMass) {
+							Taller::PointMassComponent& pointMassB = coord.GetComponent<Taller::PointMassComponent>(auxiliarEntity.GetId());
+							Taller::ComponentOperations::BasicCollisionResolution(transform, Taller::PointMassComponent(), transformAuxiliar, pointMassB, timestep);
+						}
+						else if (!hasBMass) {
+							Taller::PointMassComponent& pointMassA = coord.GetComponent<Taller::PointMassComponent>(entity.GetId());
+							Taller::ComponentOperations::BasicCollisionResolution(transform, pointMassA, transformAuxiliar, Taller::PointMassComponent(), timestep);
+						}
+						else {
+							Taller::PointMassComponent& pointMassA = coord.GetComponent<Taller::PointMassComponent>(entity.GetId());
+							Taller::PointMassComponent& pointMassB = coord.GetComponent<Taller::PointMassComponent>(auxiliarEntity.GetId());
+							Taller::ComponentOperations::BasicCollisionResolution(transform, pointMassA, transformAuxiliar, pointMassB, timestep);
+						}
+
+					}
+				}
+			}
+		}
+	
+		//Applies forces
+		{
+			TL_PROFILE_SCOPE("Integrate");
+
+			for (Taller::Entity entity : coord.QueryEntitiesBySignature(physicsSignature)) {
+				Taller::TransformComponent& transform = coord.GetComponent<Taller::TransformComponent>(entity.GetId());
+				Taller::PointMassComponent& pointMass = coord.GetComponent<Taller::PointMassComponent>(entity.GetId());
+
+				Taller::ComponentOperations::Integrate(transform, pointMass, timestep);
+			}
+		}
+}
 
 	void OnEvent(Taller::Event& e) override {
 		TL_LOG_INFO(true, "Layer event : %s", e.ToString());
@@ -460,7 +552,12 @@ public:
 		TL_PROFILE_FUNCTION();
 
 		ImGui::Begin("Physics!");
-
+		ImGui::Text("Axolote box colision position");
+		ImGui::Separator();
+		float vec4a[4] = { debugMaxCollisionPoint.x, debugMaxCollisionPoint.y, debugMaxCollisionPoint.z };
+		ImGui::InputFloat3("Max", vec4a);
+		float vec4b[4] = { debugMinCollisionPoint.x, debugMinCollisionPoint.y, debugMinCollisionPoint.z };
+		ImGui::InputFloat3("Min", vec4b);
 		ImGui::End();
 
 	}
@@ -470,10 +567,14 @@ private:
 	Taller::Coordinator& coord = Taller::Application::Get().GetCoordinator();
 
 	Taller::Signature physicsSignature;
+	Taller::Signature collisionSignature;
 
 
 	using forceFunction = std::function<void(Taller::PointMassComponent&, float)>;
 	std::unordered_map<Taller::ForceGenerator, forceFunction> forcesRegistry;
+
+	glm::vec3 debugMaxCollisionPoint;
+	glm::vec3 debugMinCollisionPoint;
 };
 
 
