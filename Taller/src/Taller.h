@@ -29,3 +29,5 @@
 #include "Taller/Renderer/Mesh.h"
 #include "Taller/Renderer/Texture.h"
 /* ------------------- */
+
+#include "Taller/Audio/Audio.h"

@@ -2,9 +2,14 @@
 #include <Taller/Core/EntryPoint.h>
 #include <Taller/Core/Window.h>
 #include <Platform/OpenGL/OpenGLShader.h>
+
 #include "ImGui/imgui.h"
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
+
+
 
 //TODO A veces crashea el buffer al cargar el modelado
 //TODO Valorar si compensa hacer una plantilla AssetLibrary<T>
@@ -20,6 +25,7 @@
 //TODO Hacer que solo haga una vez el calculo de la direccion de la luz
 
 //TODO Si arrastras la ventana el sistema de colisiones para de funcionar (porque se para el sistema de capas) y eso hace que atraviese el suelo si se pilla en el momento justo que hace la colision
+//TODO Hacer OnTriggerEnter y OnTriggerExit y el boxcollider solo tenga el evento OnContact?
 //TODO Hacer que el ECS devuelva una estructura por defecto si no encuentra el componente que busca en la entidad
 
 #pragma region PLACE_HOLDER_DATA
@@ -154,6 +160,15 @@ std::string triangleFragmentSrc = R"(
 		)";
 #pragma endregion
 
+//Can be declare each library locally in each layer to take more controll over each asset stored in each layer
+struct AssetManager {
+	Taller::SoundLibrary m_SoundLibrary;
+	Taller::ShaderLibrary m_ShaderLibrary;
+	Taller::MeshLibrary m_MeshLibrary;
+	Taller::Texture2DLibrary m_Texture2DLibrary;
+} g_AssetManager;
+
+
 class RenderLayer : public Taller::Layer {
 public:
 	RenderLayer() : Layer("Render") {
@@ -171,13 +186,13 @@ public:
 		coord.AddComponent<Taller::TransformComponent>(axolotl, glm::vec3(0.0f), glm::vec3(-45.0f), glm::vec3(0.25f));
 		coord.AddComponent<Taller::StaticMeshComponent>(axolotl, "TriangleShader", "axolotl", "cyan_texture");
 		coord.AddComponent<Taller::PointMassComponent>(axolotl, glm::vec3(0.0f), glm::vec3(0.0f), 0.9f, ((float)1.0f) / 20.0f);
-		coord.AddComponent<Taller::BoxCollisionComponent>(axolotl, glm::vec3( 0.05f, 0.05f, 0.05f ), [&](int a, int b) {TL_LOG_INFO(true, "Axolotl has collision!!"); });
+		coord.AddComponent<Taller::BoxCollisionComponent>(axolotl, glm::vec3( 0.05f, 0.05f, 0.05f ), [&](int a, int b) { Taller::AudioCommand::PlayAudio(g_AssetManager.m_SoundLibrary.Get("sfx"), false, 1.0f, 0.0f); });
 		Taller::StaticMeshComponent& axolotl_SM = coord.GetComponent<Taller::StaticMeshComponent>(axolotl);
 		coord.GroupEntity(axolotl,"Movable");
 
-		m_Texture2DLibrary.Load(axolotl_SM.textureName, "assets/textures/axolotl_cyan.png");
-		m_MeshLibrary.Load(axolotl_SM.meshName, "assets/3dmodels/axolotl.tmesh");
-		m_ShaderLibrary.Load(axolotl_SM.shaderName, triangleVertexSrc, triangleFragmentSrc);
+		g_AssetManager.m_Texture2DLibrary.Load(axolotl_SM.textureName, "assets/textures/axolotl_cyan.png");
+		g_AssetManager.m_MeshLibrary.Load(axolotl_SM.meshName, "assets/3dmodels/axolotl.tmesh");
+		g_AssetManager.m_ShaderLibrary.Load(axolotl_SM.shaderName, triangleVertexSrc, triangleFragmentSrc);
 		//----------------------------------//
 
 		
@@ -190,19 +205,19 @@ public:
 		Taller::StaticMeshComponent& cube_SM = coord.GetComponent<Taller::StaticMeshComponent>(cube);
 		
 
-		m_MeshLibrary.Load(cube_SM.meshName, "assets/3dmodels/Cube.tmesh");
-		m_ShaderLibrary.Load(cube_SM.shaderName, "assets/shaders/cube.glsl");
+		g_AssetManager.m_MeshLibrary.Load(cube_SM.meshName, "assets/3dmodels/Cube.tmesh");
+		g_AssetManager.m_ShaderLibrary.Load(cube_SM.shaderName, "assets/shaders/cube.glsl");
 		//----------------------------------//
 
 		/* CREATES A GROUND PLANE ENTITY */
 		Taller::Entity plane = coord.CreateEntity();
 		coord.AddComponent<Taller::TransformComponent>(plane, glm::vec3(0.0f, -3.0f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(15.0f));
 		coord.AddComponent<Taller::StaticMeshComponent>(plane, "CubeShader", "", "square");
-		coord.AddComponent<Taller::BoxCollisionComponent>(plane, glm::vec3({ 1.0f, 0.05f, 1.0f }));
+		coord.AddComponent<Taller::BoxCollisionComponent>(plane, glm::vec3({ 1.0f, 0.05f, 1.0f }), [&](int a, int b) {  });
 		Taller::StaticMeshComponent& plane_SM = coord.GetComponent<Taller::StaticMeshComponent>(plane);
 		coord.GroupEntity(plane, "Static");
 
-		m_MeshLibrary.Load(plane_SM.meshName, "assets/3dmodels/Square.tmesh");
+		g_AssetManager.m_MeshLibrary.Load(plane_SM.meshName, "assets/3dmodels/Square.tmesh");
 		//----------------------------------//
 
 
@@ -211,7 +226,7 @@ public:
 		coord.AddComponent<Taller::TransformComponent>(axolotlSecond, glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(-45.0f), glm::vec3(0.25f));
 		coord.AddComponent<Taller::StaticMeshComponent>(axolotlSecond, "TriangleShader", "axolotl", "cyan_texture");
 		coord.AddComponent<Taller::PointMassComponent>(axolotlSecond, glm::vec3(0.0f), glm::vec3(0.0f), 0.9f, ((float)1.0f) / 10.0f);
-		coord.AddComponent<Taller::BoxCollisionComponent>(axolotlSecond, glm::vec3(0.05f, 0.05f, 0.05f), [&](int a, int b) {TL_LOG_INFO(true, "Axolotl second has collision!!"); });
+		coord.AddComponent<Taller::BoxCollisionComponent>(axolotlSecond, glm::vec3(0.05f, 0.05f, 0.05f), [&](int a, int b) {Taller::AudioCommand::PlayAudio(g_AssetManager.m_SoundLibrary.Get("sfx"), false, 1.0f, 0.0f); });
 		Taller::StaticMeshComponent& axolotlSecond_SM = coord.GetComponent<Taller::StaticMeshComponent>(axolotlSecond);
 		coord.GroupEntity(axolotlSecond, "Movable");
 		//----------------------------------//
@@ -243,7 +258,7 @@ public:
 		frameBufferSpecification.Attachments = { Taller::FrameBufferTextureFormat::DEPTH_COMPONENT };
 		m_ShadowMap = Taller::FrameBuffer::Create(frameBufferSpecification);
 
-		m_ShaderLibrary.Load("simpleDepth", "assets/shaders/simpleDepth.glsl");
+		g_AssetManager.m_ShaderLibrary.Load("simpleDepth", "assets/shaders/simpleDepth.glsl");
 	};
 
 	void OnUpdate(Taller::Timestep timestep) override {
@@ -276,8 +291,8 @@ public:
 					beginSceneData_ShadowMapping.LightProjectionView = lightProjection * lightView;
 					Taller::Renderer::BeginScene(beginSceneData_ShadowMapping);
 
-					auto shader = m_ShaderLibrary.Get("simpleDepth");
-					auto mesh = m_MeshLibrary.Get(staticMesh.meshName);
+					auto shader = g_AssetManager.m_ShaderLibrary.Get("simpleDepth");
+					auto mesh = g_AssetManager.m_MeshLibrary.Get(staticMesh.meshName);
 
 
 					Taller::Renderer::Submit(shader, mesh, transform.location, transform.rotation, transform.scale);
@@ -358,10 +373,10 @@ public:
 					beginSceneData_Render.LightProjectionView = lightProjection * lightView;
 					Taller::Renderer::BeginScene(beginSceneData_Render);
 
-						auto shader = m_ShaderLibrary.Get(staticMesh.shaderName);
+						auto shader = g_AssetManager.m_ShaderLibrary.Get(staticMesh.shaderName);
 
-						auto texture = staticMesh.textureName != "" ? m_Texture2DLibrary.Get(staticMesh.textureName) : nullptr;
-						auto mesh = m_MeshLibrary.Get(staticMesh.meshName);
+						auto texture = staticMesh.textureName != "" ? g_AssetManager.m_Texture2DLibrary.Get(staticMesh.textureName) : nullptr;
+						auto mesh = g_AssetManager.m_MeshLibrary.Get(staticMesh.meshName);
 
 
 						if (texture) {
@@ -408,9 +423,7 @@ public:
 
 
 private:
-	Taller::ShaderLibrary m_ShaderLibrary;
-	Taller::MeshLibrary m_MeshLibrary;
-	Taller::Texture2DLibrary m_Texture2DLibrary;
+
 
 	Taller::TransformComponent& transformCam = Taller::TransformComponent();
 	Taller::CameraComponent& cam = Taller::CameraComponent();
@@ -578,15 +591,55 @@ private:
 };
 
 
+class AudioLayer : public Taller::Layer{
+public:
+	AudioLayer() : Layer("AudioLayer") {
+		Taller::AudioCommand::InitAudioEngine();
+		
+		g_AssetManager.m_SoundLibrary.Load("sfx", "C:\\dev\\GameEngine_Taller\\Taller\\SandboxProjects\\Sandbox\\assets\\audios\\boing.wav");
+		g_AssetManager.m_SoundLibrary.Load("music", "C:\\dev\\GameEngine_Taller\\Taller\\SandboxProjects\\Sandbox\\assets\\audios\\music.wav");
+	
+		Taller::AudioCommand::PlayAudio(g_AssetManager.m_SoundLibrary.Get("music"), true, 1.0f, 0.0f);
+		
+	};
+
+	void OnDetach() override{
+		Taller::AudioCommand::DeinitAudioEngine();
+	}
+
+	void OnUpdate(Taller::Timestep timestep) override{
+		TL_PROFILE_FUNCTION();
+
+		
+	}
+
+	void OnEvent(Taller::Event& e) override{
+
+	}
+
+	virtual void OnImGuiRender() override {
+
+	}
+
+private:
+	Taller::Coordinator& coord = Taller::Application::Get().GetCoordinator();
+
+	Taller::Signature audioSignature;
+};
+
+
+
+
+
+
 class Sandbox : public Taller::Application {
 public:
 	Sandbox() {
 		PushLayer(new PhysicsLayer());
 		PushLayer(new RenderLayer());
+		PushLayer(new AudioLayer());
 	}
 	~Sandbox() {}
-
-private:
 
 };
 
