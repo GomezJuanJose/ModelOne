@@ -1,4 +1,4 @@
-workspace "Taller"
+workspace "Primitivo"
     architecture "x64"
 
     configurations{
@@ -13,24 +13,24 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 --Include directories relative to root folder (solution directory)
 IncludeDir = {}
-IncludeDir["GLFW"] = "Taller/vendor/GLFW/include"
-IncludeDir["Glad"] = "Taller/vendor/Glad/include"
-IncludeDir["ImGui"] = "Taller/vendor/ImGui"
-IncludeDir["glm"] = "Taller/vendor/glm"
-IncludeDir["stb_image"] = "Taller/vendor/stb_image"
-IncludeDir["SoLoud"] = "Taller/vendor/SoLoud/include"
+IncludeDir["GLFW"] = "Primitivo/vendor/GLFW/include"
+IncludeDir["Glad"] = "Primitivo/vendor/Glad/include"
+IncludeDir["ImGui"] = "Primitivo/vendor/ImGui"
+IncludeDir["glm"] = "Primitivo/vendor/glm"
+IncludeDir["stb_image"] = "Primitivo/vendor/stb_image"
+IncludeDir["SoLoud"] = "Primitivo/vendor/SoLoud/include"
 
 
 group "Dependencies"
-    include "Taller/vendor/GLFW"
-    include "Taller/vendor/Glad"
-    include "Taller/vendor/ImGui"
-    include "Taller/vendor/SoLoud"
+    include "Primitivo/vendor/GLFW"
+    include "Primitivo/vendor/Glad"
+    include "Primitivo/vendor/ImGui"
+    include "Primitivo/vendor/SoLoud"
 group""
 
 
-project "Taller"
-    location "Taller"
+project "Primitivo"
+    location "Primitivo"
     kind "StaticLib"
     language "C++"
     cppdialect "C++17"
@@ -39,8 +39,8 @@ project "Taller"
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
     
-    pchheader "tlpch.h"
-    pchsource "Taller/src/tlpch.cpp" --For visual studio
+    pchheader "plpch.h"
+    pchsource "Primitivo/src/plpch.cpp" --For visual studio
 
     files{
         "%{prj.name}/src/**.h",
@@ -109,14 +109,14 @@ project "Sandbox"
 
     includedirs{
         --Use for third parties libs in this case
-        --"Taller/vendor/THIRD_PARTY_LIB/include",
-        "Taller/src",
-        "Taller/vendor",
+        --"Primitivo/vendor/THIRD_PARTY_LIB/include",
+        "Primitivo/src",
+        "Primitivo/vendor",
         "%{IncludeDir.glm}"
     }
 
     links{
-        "Taller" --Links the sandobx with the engine (the dynamic lib)
+        "Primitivo" --Links the sandobx with the engine (the dynamic lib)
     }
 
     filter "system:windows" --Tabulation doesnt mean anything, from this line below is applied only for windows 
