@@ -20,7 +20,7 @@ namespace ModelOne {
 		}
 
 		static void Integrate(TransformComponent& transform, PointMassComponent& pointMass, float timestep) {
-			
+
 			MO_PROFILE_FUNCTION();
 
 			if (pointMass.inverseMass <= 0.0f) {
@@ -28,7 +28,7 @@ namespace ModelOne {
 			}
 
 			transform.location += pointMass.velocity * timestep;
-			
+
 			glm::vec3 resultingAcc = pointMass.acceleration;
 			resultingAcc += pointMass.forceAccumulation * pointMass.inverseMass;
 
@@ -45,14 +45,14 @@ namespace ModelOne {
 
 			glm::vec3 gravity = { 0.0f, -1.0f, 0.0f };
 
-			pointMass.forceAccumulation += gravity * (1.0f/pointMass.inverseMass);
+			pointMass.forceAccumulation += gravity * (1.0f / pointMass.inverseMass);
 		}
 
 		static void ApplyDragForce(PointMassComponent& pointMass, float timestep) {
-			
+
 			float k1 = 0.9f;
 			float k2 = 0.5f;
-			
+
 			if (glm::length(pointMass.velocity) == 0.0f) {
 				return;
 			}
@@ -80,11 +80,13 @@ namespace ModelOne {
 
 		static void BasicCollisionResolution(TransformComponent& transformA, PointMassComponent& pointMassA, TransformComponent& transformB, PointMassComponent& pointMassB, float timestep) {
 			//Calculate normal
-			glm::vec3 normalImpact = transformA.location - transformB.location;
-			float m = glm::sqrt(normalImpact.x * normalImpact.x + normalImpact.y * normalImpact.y + normalImpact.z * normalImpact.z);
-			normalImpact.x /= m;
-			normalImpact.y /= m;
-			normalImpact.z /= m;
+			//glm::vec3 normalImpact = transformA.location - transformB.location;
+			//float m = glm::sqrt(normalImpact.x * normalImpact.x + normalImpact.y * normalImpact.y + normalImpact.z * normalImpact.z);
+			//normalImpact.x = 0.0f;
+			//normalImpact.y = 1.0f;
+			//normalImpact.z = 0.0f;
+			glm::vec3 normalImpact = ((pointMassA.velocity + pointMassB.velocity) / 2.0f) * -1.0f;
+			normalImpact = glm::normalize(normalImpact);
 
 			float restitution = 1.0f;
 

@@ -22,7 +22,6 @@ namespace ModelOne {
 	};
 
 	void PhysicsLayer::OnUpdate(Timestep timestep) {
-
 		MO_PROFILE_FUNCTION();
 
 		//Applies forces
@@ -52,14 +51,17 @@ namespace ModelOne {
 				TransformComponent& transform = coord.GetComponent<TransformComponent>(entity.GetId());
 				BoxCollisionComponent& boxCollision = coord.GetComponent<BoxCollisionComponent>(entity.GetId());
 
+				if (coord.HasComponent < PointMassComponent>(entity)) {
+					PointMassComponent& pointmass = coord.GetComponent<PointMassComponent>(entity.GetId());
+					debugMaxCollisionPoint = pointmass.velocity;
+				}
 				boxCollision.maxPoint = transform.location + boxCollision.size;
 				boxCollision.minPoint = transform.location - boxCollision.size;
 
-				debugMaxCollisionPoint = boxCollision.maxPoint;
-				debugMinCollisionPoint = boxCollision.minPoint;
 
 
-				for (auto j = i; j != entities.end(); j++) {
+
+				for (auto j = entities.begin(); j != entities.end(); j++) {
 					Entity auxiliarEntity = *j;
 
 					if (auxiliarEntity.GetId() == entity.GetId()) {
