@@ -106,6 +106,10 @@ namespace ModelOne{
 	}
 
 	std::set<Entity> Coordinator::GetEntitiesByGroup(const std::string& group) const {
+		if (m_EntitiesPerGroup.find(group) == m_EntitiesPerGroup.end()) {
+			return {};
+		}
+
 		return m_EntitiesPerGroup.at(group);												//Not handles if the users inserts a wrong group name that was not proviously added because is O(N)
 	}
 
