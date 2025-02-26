@@ -112,7 +112,7 @@ namespace ModelOne {
 				MO_PROFILE_SCOPE("Render preparation");
 
 				RenderCommand::SetViewport(0, 0, Application::Get().GetWindow().GetWidth(), Application::Get().GetWindow().GetHeight());
-				RenderCommand::SetClearColor({ 0.7f, 0.0f, 0.7f, 1.0f });
+				RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.4f, 1.0f });
 				RenderCommand::Clear();
 			}
 
