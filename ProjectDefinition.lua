@@ -1,4 +1,4 @@
-workspace "Primitivo"
+workspace "ModelOne"
     architecture "x64"
 
     configurations{
@@ -13,24 +13,24 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 --Include directories relative to root folder (solution directory)
 IncludeDir = {}
-IncludeDir["GLFW"] = "Primitivo/vendor/GLFW/include"
-IncludeDir["Glad"] = "Primitivo/vendor/Glad/include"
-IncludeDir["ImGui"] = "Primitivo/vendor/ImGui"
-IncludeDir["glm"] = "Primitivo/vendor/glm"
-IncludeDir["stb_image"] = "Primitivo/vendor/stb_image"
-IncludeDir["SoLoud"] = "Primitivo/vendor/SoLoud/include"
+IncludeDir["GLFW"] = "ModelOne/vendor/GLFW/include"
+IncludeDir["Glad"] = "ModelOne/vendor/Glad/include"
+IncludeDir["ImGui"] = "ModelOne/vendor/ImGui"
+IncludeDir["glm"] = "ModelOne/vendor/glm"
+IncludeDir["stb_image"] = "ModelOne/vendor/stb_image"
+IncludeDir["SoLoud"] = "ModelOne/vendor/SoLoud/include"
 
 
 group "Dependencies"
-    include "Primitivo/vendor/GLFW"
-    include "Primitivo/vendor/Glad"
-    include "Primitivo/vendor/ImGui"
-    include "Primitivo/vendor/SoLoud"
+    include "ModelOne/vendor/GLFW"
+    include "ModelOne/vendor/Glad"
+    include "ModelOne/vendor/ImGui"
+    include "ModelOne/vendor/SoLoud"
 group""
 
 
-project "Primitivo"
-    location "Primitivo"
+project "ModelOne"
+    location "ModelOne"
     kind "StaticLib"
     language "C++"
     cppdialect "C++17"
@@ -39,8 +39,8 @@ project "Primitivo"
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
     
-    pchheader "plpch.h"
-    pchsource "Primitivo/src/plpch.cpp" --For visual studio
+    pchheader "mopch.h"
+    pchsource "ModelOne/src/mopch.cpp" --For visual studio
 
     files{
         "%{prj.name}/src/**.h",
@@ -74,21 +74,21 @@ project "Primitivo"
         systemversion "latest"
 
         defines{
-            "TL_PLATFORM_WINDOWS",
-            "TL_BUILD_DLL",
+            "MO_PLATFORM_WINDOWS",
+            "MO_BUILD_DLL",
             "GLFW_INCLUDE_NONE"
         }
 
     filter "configurations:Debug"
-        defines "TL_DEBUG"
+        defines "MO_DEBUG"
         symbols "on"
 
     filter "configurations:Release"
-        defines "TL_RELEASE"
+        defines "MO_RELEASE"
         optimize "on"
 
     filter "configurations:Distribution"
-        defines "TL_DISTRIBUTION"
+        defines "MO_DISTRIBUTION"
         optimize "on"
 
 
@@ -109,31 +109,31 @@ project "Sandbox"
 
     includedirs{
         --Use for third parties libs in this case
-        --"Primitivo/vendor/THIRD_PARTY_LIB/include",
-        "Primitivo/src",
-        "Primitivo/vendor",
+        --"ModelOne/vendor/THIRD_PARTY_LIB/include",
+        "ModelOne/src",
+        "ModelOne/vendor",
         "%{IncludeDir.glm}"
     }
 
     links{
-        "Primitivo" --Links the sandobx with the engine (the dynamic lib)
+        "ModelOne" --Links the sandobx with the engine (the dynamic lib)
     }
 
     filter "system:windows" --Tabulation doesnt mean anything, from this line below is applied only for windows 
         systemversion "latest"
 
         defines{
-            "TL_PLATFORM_WINDOWS"
+            "MO_PLATFORM_WINDOWS"
         }
 
     filter "configurations:Debug"
-        defines "TL_DEBUG"
+        defines "MO_DEBUG"
         symbols "on"
 
     filter "configurations:Release"
-        defines "TL_RELEASE"
+        defines "MO_RELEASE"
         optimize "on"
 
     filter "configurations:Distribution"
-        defines "TL_DISTRIBUTION"
+        defines "MO_DISTRIBUTION"
         optimize "on"
