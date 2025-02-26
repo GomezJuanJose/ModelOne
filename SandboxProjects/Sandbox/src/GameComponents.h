@@ -13,6 +13,8 @@ namespace SandboxApp {
 		float right_current_speed;
 		float forward_current_speed;
 		float backward_current_speed;
+		float up_current_speed;
+		float down_current_speed;
 
 		float speed;
 
@@ -23,24 +25,28 @@ namespace SandboxApp {
 
 		float sensivity;
 
+		bool enable_camera_movement;
+
 		bool is_valid;
 
-		PlayerMovement(float speed = 5.0f, float sensivity = 100.0f) :
+		PlayerMovement(float speed = 10.0f, float sensivity = 100.0f) :
 			speed(speed), sensivity(sensivity),
-			left_current_speed(0.0f), right_current_speed(0.0f), forward_current_speed(0.0f), backward_current_speed(0.0f), 
-			x_axis(0.0f), y_axis(0.0f), x_axis_speed(0.0f), y_axis_speed(0.0f), is_valid(true) {
+			left_current_speed(0.0f), right_current_speed(0.0f), 
+			forward_current_speed(0.0f), backward_current_speed(0.0f), 
+			up_current_speed(0.0f), down_current_speed(0.0f),
+			x_axis(0.0f), y_axis(0.0f), x_axis_speed(0.0f), y_axis_speed(0.0f), enable_camera_movement(false), is_valid(true) {
 		}
 	};
 
 
-	using func = void(*)(PlayerMovement& player_mov, int keycode, ModelOne::Event* e);
+	using input_func = void(*)(PlayerMovement& player_mov, int keycode, ModelOne::Event* e);
 	struct InputComponent {
 
-		std::unordered_map<int, func> keys_functions;
+		std::unordered_map<int, input_func> keys_functions;
 
 		bool is_valid;
 
-		InputComponent(std::unordered_map<int, func> keys_functions = {}) : keys_functions(keys_functions), is_valid(true) {
+		InputComponent(std::unordered_map<int, input_func> keys_functions = {}) : keys_functions(keys_functions), is_valid(true) {
 		}
 	};
 }

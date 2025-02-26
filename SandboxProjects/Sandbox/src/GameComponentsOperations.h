@@ -23,6 +23,15 @@ namespace SandboxApp {
 			if (keycode == MO_KEY_S) {
 				player_mov.backward_current_speed = 1.0f * player_mov.speed;
 			}
+			if (keycode == MO_KEY_Q) {
+				player_mov.up_current_speed = 1.0f * player_mov.speed;
+			}
+			if (keycode == MO_KEY_E) {
+				player_mov.down_current_speed = -1.0f * player_mov.speed;
+			}
+			if (keycode == MO_KEY_SPACE) {
+				player_mov.enable_camera_movement = true;
+			}
 		}
 		else if (e->GetEventType() == ModelOne::EventType::KeyReleased) {
 			if (keycode == MO_KEY_A) {
@@ -36,6 +45,15 @@ namespace SandboxApp {
 			}
 			if (keycode == MO_KEY_S) {
 				player_mov.backward_current_speed = 0;
+			}
+			if (keycode == MO_KEY_Q) {
+				player_mov.up_current_speed = 0;
+			}
+			if (keycode == MO_KEY_E) {
+				player_mov.down_current_speed = 0;
+			}
+			if (keycode == MO_KEY_SPACE) {
+				player_mov.enable_camera_movement = false;
 			}
 		}
 	}
