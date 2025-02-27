@@ -92,6 +92,7 @@ project "ModelOne"
         optimize "on"
 
 
+
 project "Sandbox"
     location "SandboxProjects/Sandbox"
     kind "ConsoleApp"
@@ -134,6 +135,54 @@ project "Sandbox"
         defines "MO_RELEASE"
         optimize "on"
 
+    filter "configurations:Distribution"
+        defines "MO_DISTRIBUTION"
+        optimize "on"
+
+
+
+project "EmptyApp"
+    location "SandboxProjects/EmptyApp"
+    kind "ConsoleApp"
+    language "C++"
+    cppdialect "C++17"
+    staticruntime "on" --Links the run time libraries as static
+    
+    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+    objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+        
+    files{
+        "%{prj.location}/src/**.h",
+        "%{prj.location}/src/**.cpp",
+    }
+    
+    includedirs{
+        --Use for third parties libs in this case
+        --"ModelOne/vendor/THIRD_PARTY_LIB/include",
+        "ModelOne/src",
+        "ModelOne/vendor",
+        "%{IncludeDir.glm}"
+    }
+    
+    links{
+        "ModelOne" --Links the sandobx with the engine (the dynamic lib)
+    }
+    
+    filter "system:windows" --Tabulation doesnt mean anything, from this line below is applied only for windows 
+        systemversion "latest"
+    
+        defines{
+            "MO_PLATFORM_WINDOWS"
+        }
+    
+    filter "configurations:Debug"
+        defines "MO_DEBUG"
+        symbols "on"
+    
+    filter "configurations:Release"
+        defines "MO_RELEASE"
+        optimize "on"
+    
     filter "configurations:Distribution"
         defines "MO_DISTRIBUTION"
         optimize "on"
