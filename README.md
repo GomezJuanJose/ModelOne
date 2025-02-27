@@ -5,7 +5,7 @@
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
 
 ## Description
-ModelOne is primarily an early-stage game engine for Windows written in C++. Available features are::
+ModelOne is primarily an early-stage game engine for Windows written in C++. Available features are:
 + Layered architecture
 + ECS
 + Renderer with OpenGL
