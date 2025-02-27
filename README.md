@@ -31,7 +31,7 @@ Visual Studio 2019 or later is recommended, ModelOne is untested in other develo
 
 Execute the script `Windows-ProjectGeneration.bat` located in the folder `/Scripts`. After the execution, open `ModelOne.sln` and press F5.
 
-![](showcasegif.gif)
+![](showcase.gif)
 
 ## Getting started
 Open the `EmptyApp` project from the solution and mark it as the started project. It contains the basics to create a window with all the systems initialized:
