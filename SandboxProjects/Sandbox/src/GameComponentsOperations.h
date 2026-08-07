@@ -1,7 +1,6 @@
 #pragma once
 #include <ModelOne/Core/KeyCodes.h>
 
-enum class ModelOne::EventType;
 class ModelOne::MouseMovedEvent;
 
 namespace SandboxApp {
